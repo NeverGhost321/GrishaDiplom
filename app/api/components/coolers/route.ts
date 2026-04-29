@@ -23,7 +23,10 @@ export async function GET(request: Request) {
     };
 
     const items = await prisma.cooler.findMany({ where, orderBy: buildOrderBy(getSortOrder(params), 'model') });
-    return NextResponse.json({ items, count: items.length });
+    return NextResponse.json({
+      items: items.map((item) => ({ ...item, name: item.model })),
+      count: items.length
+    });
   } catch {
     return NextResponse.json({ error: 'Не удалось получить список комплектующих.' }, { status: 500 });
   }
