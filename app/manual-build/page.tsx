@@ -47,6 +47,21 @@ function isCompleteSelection(selected: SelectedIds): selected is Record<keyof Se
   return Object.values(selected).every((value) => typeof value === 'number' && value > 0);
 }
 
+function getName(item: { name?: string; model?: string } | undefined): string {
+  if (!item) return 'Не выбрано';
+  return item.name ?? item.model ?? 'Без названия';
+}
+
+function getCpuTdp(cpu: (Cpu & { tdpWatts?: number }) | undefined): number | null {
+  if (!cpu) return null;
+  return (cpu as unknown as { tdp?: number; tdpWatts?: number }).tdp ?? (cpu as unknown as { tdpWatts?: number }).tdpWatts ?? null;
+}
+
+function getGpuPower(gpu: (Gpu & { powerDrawWatts?: number }) | undefined): number | null {
+  if (!gpu) return null;
+  return (gpu as unknown as { powerConsumption?: number; powerDrawWatts?: number }).powerConsumption ?? (gpu as unknown as { powerDrawWatts?: number }).powerDrawWatts ?? null;
+}
+
 export default function ManualBuildPage() {
   const [components, setComponents] = useState<ManualBuildState>({
     cpus: [], motherboards: [], rams: [], gpus: [], psus: [], storages: [], cases: [], coolers: [],
@@ -202,14 +217,14 @@ export default function ManualBuildPage() {
       <Card title="Выбор комплектующих" description="Выберите компоненты для ручной проверки совместимости.">
         {loading ? <LoadingCard label="Загружаем списки комплектующих..." /> : (
           <div className="grid gap-4 md:grid-cols-2">
-            <Select label="Процессор" value={selected.cpuId} onChange={(v) => updateSelect('cpuId', v)} options={components.cpus.map((item) => ({ value: item.id, label: `${item.brand} ${item.name} — ${item.socket}, ${item.tdp} Вт — ${item.price.toLocaleString('ru-RU')} ₽` }))} />
-            <Select label="Материнская плата" value={selected.motherboardId} onChange={(v) => updateSelect('motherboardId', v)} options={components.motherboards.map((item) => ({ value: item.id, label: `${item.name} — ${item.socket}, ${item.memoryType}, ${item.formFactor} — ${item.price.toLocaleString('ru-RU')} ₽` }))} />
-            <Select label="Оперативная память" value={selected.ramId} onChange={(v) => updateSelect('ramId', v)} options={components.rams.map((item) => ({ value: item.id, label: `${item.name} — ${item.memoryType}, ${item.capacityGb} ГБ, ${item.frequencyMhz} МГц — ${item.price.toLocaleString('ru-RU')} ₽` }))} />
-            <Select label="Видеокарта" value={selected.gpuId} onChange={(v) => updateSelect('gpuId', v)} options={components.gpus.map((item) => ({ value: item.id, label: `${item.brand} ${item.name} — ${item.vramGb} ГБ, ${item.powerConsumption} Вт — ${item.price.toLocaleString('ru-RU')} ₽` }))} />
-            <Select label="Блок питания" value={selected.psuId} onChange={(v) => updateSelect('psuId', v)} options={components.psus.map((item) => ({ value: item.id, label: `${item.name} — ${item.wattage} Вт, ${item.efficiencyRating} — ${item.price.toLocaleString('ru-RU')} ₽` }))} />
-            <Select label="Накопитель" value={selected.storageId} onChange={(v) => updateSelect('storageId', v)} options={components.storages.map((item) => ({ value: item.id, label: `${item.name} — ${item.type}, ${item.capacityGb} ГБ, ${item.interface} — ${item.price.toLocaleString('ru-RU')} ₽` }))} />
-            <Select label="Корпус" value={selected.caseId} onChange={(v) => updateSelect('caseId', v)} options={components.cases.map((item) => ({ value: item.id, label: `${item.name} — ${item.formFactor}, GPU до ${item.maxGpuLengthMm} мм — ${item.price.toLocaleString('ru-RU')} ₽` }))} />
-            <Select label="Система охлаждения" value={selected.coolerId} onChange={(v) => updateSelect('coolerId', v)} options={components.coolers.map((item) => ({ value: item.id, label: `${item.name} — ${item.type}, TDP ${item.tdpRatingWatts} Вт — ${item.price.toLocaleString('ru-RU')} ₽` }))} />
+            <Select label="Процессор" value={selected.cpuId} onChange={(v) => updateSelect('cpuId', v)} options={components.cpus.map((item) => ({ value: item.id, label: `${item.brand} ${(item as unknown as { model?: string; name?: string }).model ?? item.name ?? 'Без названия'} — ${item.socket}, ${(item as unknown as { tdpWatts?: number; tdp?: number }).tdpWatts ?? item.tdp ?? '—'} Вт — ${item.price.toLocaleString('ru-RU')} ₽` }))} />
+            <Select label="Материнская плата" value={selected.motherboardId} onChange={(v) => updateSelect('motherboardId', v)} options={components.motherboards.map((item) => ({ value: item.id, label: `${(item as unknown as { model?: string; name?: string }).model ?? item.name ?? 'Без названия'} — ${item.socket}, ${item.memoryType}, ${item.formFactor} — ${item.price.toLocaleString('ru-RU')} ₽` }))} />
+            <Select label="Оперативная память" value={selected.ramId} onChange={(v) => updateSelect('ramId', v)} options={components.rams.map((item) => ({ value: item.id, label: `${(item as unknown as { model?: string; name?: string }).model ?? item.name ?? 'Без названия'} — ${item.memoryType}, ${item.capacityGb} ГБ, ${item.frequencyMhz} МГц — ${item.price.toLocaleString('ru-RU')} ₽` }))} />
+            <Select label="Видеокарта" value={selected.gpuId} onChange={(v) => updateSelect('gpuId', v)} options={components.gpus.map((item) => ({ value: item.id, label: `${item.brand} ${(item as unknown as { model?: string; name?: string }).model ?? item.name ?? 'Без названия'} — ${item.vramGb} ГБ, ${(item as unknown as { powerDrawWatts?: number; powerConsumption?: number }).powerDrawWatts ?? item.powerConsumption ?? '—'} Вт — ${item.price.toLocaleString('ru-RU')} ₽` }))} />
+            <Select label="Блок питания" value={selected.psuId} onChange={(v) => updateSelect('psuId', v)} options={components.psus.map((item) => ({ value: item.id, label: `${(item as unknown as { model?: string; name?: string }).model ?? item.name ?? 'Без названия'} — ${item.wattage} Вт, ${item.efficiencyRating} — ${item.price.toLocaleString('ru-RU')} ₽` }))} />
+            <Select label="Накопитель" value={selected.storageId} onChange={(v) => updateSelect('storageId', v)} options={components.storages.map((item) => ({ value: item.id, label: `${(item as unknown as { model?: string; name?: string }).model ?? item.name ?? 'Без названия'} — ${item.type}, ${item.capacityGb} ГБ, ${item.interface} — ${item.price.toLocaleString('ru-RU')} ₽` }))} />
+            <Select label="Корпус" value={selected.caseId} onChange={(v) => updateSelect('caseId', v)} options={components.cases.map((item) => ({ value: item.id, label: `${(item as unknown as { model?: string; name?: string }).model ?? item.name ?? 'Без названия'} — ${item.formFactor}, GPU до ${item.maxGpuLengthMm} мм — ${item.price.toLocaleString('ru-RU')} ₽` }))} />
+            <Select label="Система охлаждения" value={selected.coolerId} onChange={(v) => updateSelect('coolerId', v)} options={components.coolers.map((item) => ({ value: item.id, label: `${(item as unknown as { model?: string; name?: string }).model ?? item.name ?? 'Без названия'} — ${item.type}, TDP ${item.tdpRatingWatts} Вт — ${item.price.toLocaleString('ru-RU')} ₽` }))} />
           </div>
         )}
       </Card>
@@ -222,14 +237,14 @@ export default function ManualBuildPage() {
 
       <Card title="Текущая конфигурация">
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          <ComponentCard title="CPU" subtitle={selectedComponents.cpu ? `${selectedComponents.cpu.brand} ${selectedComponents.cpu.name}` : 'Не выбран'} price={selectedComponents.cpu?.price} specs={selectedComponents.cpu ? [{ label: 'Сокет', value: selectedComponents.cpu.socket }, { label: 'TDP', value: `${selectedComponents.cpu.tdp} Вт` }] : []} />
-          <ComponentCard title="Motherboard" subtitle={selectedComponents.motherboard?.name ?? 'Не выбрана'} price={selectedComponents.motherboard?.price} specs={selectedComponents.motherboard ? [{ label: 'Сокет', value: selectedComponents.motherboard.socket }, { label: 'Память', value: selectedComponents.motherboard.memoryType }, { label: 'Форм-фактор', value: selectedComponents.motherboard.formFactor }] : []} />
-          <ComponentCard title="RAM" subtitle={selectedComponents.ram?.name ?? 'Не выбрана'} price={selectedComponents.ram?.price} specs={selectedComponents.ram ? [{ label: 'Тип', value: selectedComponents.ram.memoryType }, { label: 'Объём', value: `${selectedComponents.ram.capacityGb} ГБ` }, { label: 'Частота', value: `${selectedComponents.ram.frequencyMhz} МГц` }] : []} />
-          <ComponentCard title="GPU" subtitle={selectedComponents.gpu ? `${selectedComponents.gpu.brand} ${selectedComponents.gpu.name}` : 'Не выбрана'} price={selectedComponents.gpu?.price} specs={selectedComponents.gpu ? [{ label: 'VRAM', value: `${selectedComponents.gpu.vramGb} ГБ` }, { label: 'Потребление', value: `${selectedComponents.gpu.powerConsumption} Вт` }, { label: 'PCIe', value: selectedComponents.gpu.pcieInterface }] : []} />
-          <ComponentCard title="PSU" subtitle={selectedComponents.psu?.name ?? 'Не выбран'} price={selectedComponents.psu?.price} specs={selectedComponents.psu ? [{ label: 'Мощность', value: `${selectedComponents.psu.wattage} Вт` }, { label: 'Сертификат', value: selectedComponents.psu.efficiencyRating }] : []} />
-          <ComponentCard title="Storage" subtitle={selectedComponents.storage?.name ?? 'Не выбран'} price={selectedComponents.storage?.price} specs={selectedComponents.storage ? [{ label: 'Тип', value: selectedComponents.storage.type }, { label: 'Объём', value: `${selectedComponents.storage.capacityGb} ГБ` }, { label: 'Интерфейс', value: selectedComponents.storage.interface }] : []} />
-          <ComponentCard title="Case" subtitle={selectedComponents.pcCase?.name ?? 'Не выбран'} price={selectedComponents.pcCase?.price} specs={selectedComponents.pcCase ? [{ label: 'Форм-фактор', value: selectedComponents.pcCase.formFactor }, { label: 'GPU', value: `${selectedComponents.pcCase.maxGpuLengthMm} мм` }] : []} />
-          <ComponentCard title="Cooler" subtitle={selectedComponents.cooler?.name ?? 'Не выбран'} price={selectedComponents.cooler?.price} specs={selectedComponents.cooler ? [{ label: 'Тип', value: selectedComponents.cooler.type }, { label: 'TDP', value: `${selectedComponents.cooler.tdpRatingWatts} Вт` }, { label: 'Высота', value: `${selectedComponents.cooler.heightMm} мм` }] : []} />
+          <ComponentCard title="CPU" subtitle={selectedComponents.cpu ? `${selectedComponents.cpu.brand} ${getName(selectedComponents.cpu)}` : 'Не выбран'} price={selectedComponents.cpu?.price} specs={selectedComponents.cpu ? [{ label: 'Сокет', value: selectedComponents.cpu.socket }, { label: 'TDP', value: `${getCpuTdp(selectedComponents.cpu) ?? '—'} Вт` }] : []} />
+          <ComponentCard title="Motherboard" subtitle={selectedComponents.motherboard ? getName(selectedComponents.motherboard) : 'Не выбрана'} price={selectedComponents.motherboard?.price} specs={selectedComponents.motherboard ? [{ label: 'Сокет', value: selectedComponents.motherboard.socket }, { label: 'Память', value: selectedComponents.motherboard.memoryType }, { label: 'Форм-фактор', value: selectedComponents.motherboard.formFactor }] : []} />
+          <ComponentCard title="RAM" subtitle={selectedComponents.ram ? getName(selectedComponents.ram) : 'Не выбрана'} price={selectedComponents.ram?.price} specs={selectedComponents.ram ? [{ label: 'Тип', value: selectedComponents.ram.memoryType }, { label: 'Объём', value: `${selectedComponents.ram.capacityGb} ГБ` }, { label: 'Частота', value: `${selectedComponents.ram.frequencyMhz} МГц` }] : []} />
+          <ComponentCard title="GPU" subtitle={selectedComponents.gpu ? `${selectedComponents.gpu.brand} ${getName(selectedComponents.gpu)}` : 'Не выбрана'} price={selectedComponents.gpu?.price} specs={selectedComponents.gpu ? [{ label: 'VRAM', value: `${selectedComponents.gpu.vramGb} ГБ` }, { label: 'Потребление', value: `${getGpuPower(selectedComponents.gpu) ?? '—'} Вт` }, { label: 'PCIe', value: selectedComponents.gpu.pcieInterface }] : []} />
+          <ComponentCard title="PSU" subtitle={selectedComponents.psu ? getName(selectedComponents.psu) : 'Не выбран'} price={selectedComponents.psu?.price} specs={selectedComponents.psu ? [{ label: 'Мощность', value: `${selectedComponents.psu.wattage} Вт` }, { label: 'Сертификат', value: selectedComponents.psu.efficiencyRating }] : []} />
+          <ComponentCard title="Storage" subtitle={selectedComponents.storage ? getName(selectedComponents.storage) : 'Не выбран'} price={selectedComponents.storage?.price} specs={selectedComponents.storage ? [{ label: 'Тип', value: selectedComponents.storage.type }, { label: 'Объём', value: `${selectedComponents.storage.capacityGb} ГБ` }, { label: 'Интерфейс', value: selectedComponents.storage.interface }] : []} />
+          <ComponentCard title="Case" subtitle={selectedComponents.pcCase ? getName(selectedComponents.pcCase) : 'Не выбран'} price={selectedComponents.pcCase?.price} specs={selectedComponents.pcCase ? [{ label: 'Форм-фактор', value: selectedComponents.pcCase.formFactor }, { label: 'GPU', value: `${selectedComponents.pcCase.maxGpuLengthMm} мм` }] : []} />
+          <ComponentCard title="Cooler" subtitle={selectedComponents.cooler ? getName(selectedComponents.cooler) : 'Не выбран'} price={selectedComponents.cooler?.price} specs={selectedComponents.cooler ? [{ label: 'Тип', value: selectedComponents.cooler.type }, { label: 'TDP', value: `${selectedComponents.cooler.tdpRatingWatts} Вт` }, { label: 'Высота', value: `${selectedComponents.cooler.heightMm} мм` }] : []} />
         </div>
       </Card>
 
