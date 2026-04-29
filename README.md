@@ -147,3 +147,72 @@ npm run test:watch
 - `GET /api/components/cpus`
 - `GET /api/components/gpus?minVramGb=8&sort=price_asc`
 - `GET /api/components/motherboards?socket=AM5&memoryType=DDR5`
+
+## API проверки совместимости
+
+Добавлен endpoint для проверки совместимости выбранных пользователем комплектующих:
+
+- `POST /api/compatibility/check`
+
+### Пример запроса
+
+```http
+POST /api/compatibility/check
+Content-Type: application/json
+```
+
+```json
+{
+  "cpuId": 1,
+  "motherboardId": 1,
+  "ramId": 1,
+  "gpuId": 1,
+  "psuId": 1,
+  "storageId": 1,
+  "caseId": 1,
+  "coolerId": 1
+}
+```
+
+### Пример успешного ответа
+
+```json
+{
+  "result": {
+    "isCompatible": true,
+    "errors": [],
+    "warnings": [],
+    "recommendations": [
+      "Конфигурация совместима и не содержит заметных аппаратных рисков."
+    ],
+    "totalPowerConsumption": 365,
+    "requiredPsuWattage": 438,
+    "totalPrice": 120000,
+    "compatibilityScore": 93
+  }
+}
+```
+
+### Пример ответа с ошибкой 400
+
+```json
+{
+  "error": "Некорректные данные для проверки совместимости.",
+  "details": [
+    "Отсутствует обязательное поле gpuId.",
+    "Поле psuId должно быть положительным целым числом."
+  ]
+}
+```
+
+### Пример ответа с ошибкой 404
+
+```json
+{
+  "error": "Один или несколько компонентов не найдены.",
+  "details": [
+    "Процессор с указанным id не найден.",
+    "Корпус с указанным id не найден."
+  ]
+}
+```
