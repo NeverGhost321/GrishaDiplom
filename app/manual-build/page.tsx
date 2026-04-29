@@ -289,7 +289,7 @@ export default function ManualBuildPage() {
 
       <div className="flex flex-wrap gap-3">
         {isAuthenticated ? <Button onClick={onSaveBuild} disabled={!canSave || saveLoading}>{saveLoading ? 'Сохраняем...' : 'Сохранить сборку'}</Button> : <p className="text-sm text-slate-500">Сохранение доступно только авторизованным пользователям.</p>}
-        <Button variant="ghost" onClick={onExportJson} disabled={!allSelected}>Экспортировать JSON</Button>
+        <Button variant="secondary" onClick={onExportJson} disabled={!allSelected}>Экспортировать JSON</Button>
       </div>
     </section>
   );
