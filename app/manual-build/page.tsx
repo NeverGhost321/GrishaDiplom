@@ -63,25 +63,6 @@ function getGpuPower(gpu: (Gpu & { powerDrawWatts?: number }) | undefined): numb
 }
 
 
-const normalizeCpu = (item: Cpu & { model?: string; tdpWatts?: number }): Cpu => ({
-  ...item,
-  name: item.name ?? item.model ?? 'Без названия',
-  tdp: item.tdp ?? item.tdpWatts ?? 0,
-  generation: item.generation ?? 'Не указано',
-});
-
-const normalizeGpu = (item: Gpu & { model?: string; powerDrawWatts?: number; recommendedPsuWatts?: number }): Gpu => ({
-  ...item,
-  name: item.name ?? item.model ?? 'Без названия',
-  powerConsumption: item.powerConsumption ?? item.powerDrawWatts ?? 0,
-  recommendedPsuWattage: item.recommendedPsuWattage ?? item.recommendedPsuWatts ?? 0,
-});
-
-const normalizeWithName = <T extends { name?: string; model?: string }>(item: T): T & { name: string } => ({
-  ...item,
-  name: item.name ?? item.model ?? 'Без названия',
-});
-
 export default function ManualBuildPage() {
   const [components, setComponents] = useState<ManualBuildState>({
     cpus: [], motherboards: [], rams: [], gpus: [], psus: [], storages: [], cases: [], coolers: [],

@@ -10,8 +10,8 @@
 npm install
 npx prisma generate
 npx prisma migrate dev
-npm run prisma:seed
-npm run dev
+
+
 ```
 
 ## Последовательность демонстрации
