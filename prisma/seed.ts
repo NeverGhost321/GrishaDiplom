@@ -1,6 +1,14 @@
 import { PrismaClient } from '@prisma/client/index';
+import { randomBytes, scryptSync } from 'crypto';
 
 const prisma = new PrismaClient();
+
+
+function hashPassword(password: string) {
+  const salt = randomBytes(16).toString('hex');
+  const hash = scryptSync(password, salt, 64).toString('hex');
+  return `${salt}:${hash}`;
+}
 
 async function main() {
   // Очищаем таблицы с учётом потенциальных внешних ключей на конфигурации
@@ -105,7 +113,15 @@ async function main() {
     ('Noctua NH-L9a-AM5', 'Air', 'AM5', 70, 37, 0, 24, 4900);
   `);
 
-  console.log('✅ Demo seed data inserted successfully');
+  
+
+  await prisma.user.upsert({
+    where: { email: 'admin@nexus.local' },
+    update: { name: 'ADMIN', role: 'ADMIN', passwordHash: hashPassword('ADMIN') },
+    create: { email: 'admin@nexus.local', name: 'ADMIN', role: 'ADMIN', passwordHash: hashPassword('ADMIN') },
+  });
+
+console.log('✅ Demo seed data inserted successfully');
 }
 
 main()
