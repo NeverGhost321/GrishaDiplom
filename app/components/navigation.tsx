@@ -9,6 +9,9 @@ const navItems = [
   { href: '/manual-build', label: 'Ручная сборка' },
   { href: '/components', label: 'Каталог' },
   { href: '/saved-builds', label: 'Сохранённые сборки' },
+  { href: '/account', label: 'Личный кабинет' },
+  { href: '/login', label: 'Вход' },
+  { href: '/register', label: 'Регистрация' },
   { href: '/about', label: 'О проекте' }
 ];
 

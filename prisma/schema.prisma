@@ -7,6 +7,28 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id           Int       @id @default(autoincrement())
+  email        String    @unique
+  passwordHash String
+  name         String
+  bio          String?
+  avatarUrl    String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  builds       Build[]
+  sessions     Session[]
+}
+
+model Session {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  userId    Int
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
 model Cpu {
   id                 Int      @id @default(autoincrement())
   model              String
@@ -98,17 +120,17 @@ model Storage {
 }
 
 model PcCase {
-  id                               Int      @id @default(autoincrement())
-  model                            String
-  formFactor                       String
-  supportedMotherboardFormFactors  String
-  maxGpuLengthMm                   Int
-  maxCpuCoolerHeightMm             Int
-  radiatorSupport                  String
-  fanCountIncluded                 Int
-  airflowScore                     Int
-  price                            Int
-  builds                           Build[] @relation("BuildCase")
+  id                              Int      @id @default(autoincrement())
+  model                           String
+  formFactor                      String
+  supportedMotherboardFormFactors String
+  maxGpuLengthMm                  Int
+  maxCpuCoolerHeightMm            Int
+  radiatorSupport                 String
+  fanCountIncluded                Int
+  airflowScore                    Int
+  price                           Int
+  builds                          Build[] @relation("BuildCase")
 }
 
 model Cooler {
@@ -130,6 +152,7 @@ model Build {
   budget        Int
   totalPrice    Int
   createdAt     DateTime @default(now())
+  userId        Int
   cpuId         Int
   motherboardId Int
   ramId         Int
@@ -139,6 +162,7 @@ model Build {
   caseId        Int
   coolerId      Int
 
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   cpu         Cpu         @relation(fields: [cpuId], references: [id])
   motherboard Motherboard @relation(fields: [motherboardId], references: [id])
   ram         Ram         @relation(fields: [ramId], references: [id])
