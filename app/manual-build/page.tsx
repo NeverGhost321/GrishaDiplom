@@ -6,6 +6,8 @@ import { Button } from '@/src/components/ui/Button';
 import { Card } from '@/src/components/ui/Card';
 import { CompatibilityPanel } from '@/src/components/ui/CompatibilityPanel';
 import { ComponentCard } from '@/src/components/ui/ComponentCard';
+import { LoadingCard } from '@/src/components/ui/LoadingCard';
+import { useToast } from '@/src/components/ui/Toast';
 import type { ComponentsApiResponse, CompatibilityCheckApiResponse, SelectedIds } from '@/src/types/api';
 import type { CompatibilityResult } from '@/src/types/compatibility';
 import type { Cooler, Cpu, Gpu, Motherboard, PcCase, Psu, Ram, Storage } from '@/src/types/components';
@@ -57,6 +59,7 @@ export default function ManualBuildPage() {
   const [compatibilityResult, setCompatibilityResult] = useState<CompatibilityResult | null>(null);
   const [saveLoading, setSaveLoading] = useState(false);
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
+  const { showToast } = useToast();
 
   useEffect(() => {
     async function loadAll() {
@@ -75,8 +78,10 @@ export default function ManualBuildPage() {
         ]);
         setComponents({ cpus, motherboards, rams, gpus, psus, storages, cases, coolers });
       } catch (error) {
+        console.error(error);
         const message = error instanceof Error ? error.message : 'Не удалось загрузить комплектующие.';
         setLoadingError(message);
+        showToast('Ошибка загрузки данных.', 'error');
       } finally {
         setLoading(false);
       }
@@ -106,9 +111,11 @@ export default function ManualBuildPage() {
           return;
         }
         setCompatibilityResult(data.result);
-      } catch {
+      } catch (error) {
+        console.error(error);
         setCompatibilityResult(null);
         setCompatibilityError('Ошибка сети при проверке совместимости.');
+        showToast('Ошибка проверки совместимости.', 'error');
       } finally {
         setCompatibilityLoading(false);
       }
@@ -155,8 +162,11 @@ export default function ManualBuildPage() {
         return;
       }
       setSaveMessage('Сборка успешно сохранена.');
-    } catch {
+      showToast('Сборка успешно сохранена.', 'success');
+    } catch (error) {
+      console.error(error);
       setSaveMessage('Ошибка сети при сохранении сборки.');
+      showToast('Ошибка сохранения сборки.', 'error');
     } finally {
       setSaveLoading(false);
     }
@@ -174,6 +184,7 @@ export default function ManualBuildPage() {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
+    showToast('JSON успешно экспортирован.', 'success');
   }
 
   return (
@@ -189,7 +200,7 @@ export default function ManualBuildPage() {
       {saveMessage ? <Alert variant={saveMessage.includes('успешно') ? 'success' : 'danger'} title="Сохранение">{saveMessage}</Alert> : null}
 
       <Card title="Выбор комплектующих" description="Выберите компоненты для ручной проверки совместимости.">
-        {loading ? <p className="text-slate-300">Загружаем списки комплектующих...</p> : (
+        {loading ? <LoadingCard label="Загружаем списки комплектующих..." /> : (
           <div className="grid gap-4 md:grid-cols-2">
             <Select label="Процессор" value={selected.cpuId} onChange={(v) => updateSelect('cpuId', v)} options={components.cpus.map((item) => ({ value: item.id, label: `${item.brand} ${item.name} — ${item.socket}, ${item.tdp} Вт — ${item.price.toLocaleString('ru-RU')} ₽` }))} />
             <Select label="Материнская плата" value={selected.motherboardId} onChange={(v) => updateSelect('motherboardId', v)} options={components.motherboards.map((item) => ({ value: item.id, label: `${item.name} — ${item.socket}, ${item.memoryType}, ${item.formFactor} — ${item.price.toLocaleString('ru-RU')} ₽` }))} />

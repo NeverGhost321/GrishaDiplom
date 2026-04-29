@@ -7,6 +7,8 @@ import { Alert } from '@/src/components/ui/Alert';
 import { Button } from '@/src/components/ui/Button';
 import { Card } from '@/src/components/ui/Card';
 import { CompatibilityPanel } from '@/src/components/ui/CompatibilityPanel';
+import { LoadingCard } from '@/src/components/ui/LoadingCard';
+import { useToast } from '@/src/components/ui/Toast';
 import type { CompatibilityResult } from '@/src/types/compatibility';
 import type { SavedBuild } from '@/src/types/build';
 
@@ -23,6 +25,8 @@ export default function BuildDetailsPage({ params }: { params: { id: string } })
   const [notFound, setNotFound] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [pdfExporting, setPdfExporting] = useState(false);
+  const [jsonExporting, setJsonExporting] = useState(false);
+  const { showToast } = useToast();
 
   useEffect(() => {
     async function loadBuild() {
@@ -34,8 +38,10 @@ export default function BuildDetailsPage({ params }: { params: { id: string } })
         if (!response.ok || !data.item) return setError(data.error || 'Не удалось загрузить сборку.');
         setBuild(data.item);
         setCompatibilityResult(data.compatibilityResult ?? null);
-      } catch {
+      } catch (error) {
+        console.error(error);
         setError('Ошибка сети при загрузке сборки.');
+        showToast('Ошибка загрузки данных.', 'error');
       } finally {
         setLoading(false);
       }
@@ -54,9 +60,12 @@ export default function BuildDetailsPage({ params }: { params: { id: string } })
     try {
       const response = await fetch(`/api/builds/${build.id}`, { method: 'DELETE' });
       if (!response.ok) throw new Error();
+      showToast('Сборка успешно удалена.', 'success');
       router.push('/saved-builds');
-    } catch {
+    } catch (error) {
+      console.error(error);
       setError('Не удалось удалить сборку.');
+      showToast('Ошибка удаления сборки.', 'error');
     } finally {
       setDeleting(false);
     }
@@ -81,14 +90,17 @@ export default function BuildDetailsPage({ params }: { params: { id: string } })
       link.click();
       link.remove();
       URL.revokeObjectURL(downloadUrl);
-    } catch {
+      showToast('PDF успешно экспортирован.', 'success');
+    } catch (error) {
+      console.error(error);
       setError('Не удалось скачать PDF-файл сборки.');
+      showToast('Ошибка экспорта PDF.', 'error');
     } finally {
       setPdfExporting(false);
     }
   }
 
-  if (loading) return <div className="rounded-xl border border-slate-800 bg-slate-900 p-6 text-slate-300">Загружаем детали сборки...</div>;
+  if (loading) return <LoadingCard label="Загружаем детали сборки..." />;
   if (notFound) return <Alert variant="warning" title="Сборка не найдена">Сборка с ID {params.id} отсутствует.</Alert>;
   if (error || !build) return <Alert variant="danger" title="Ошибка загрузки">{error || 'Пустые данные сборки.'}</Alert>;
 
@@ -112,7 +124,7 @@ export default function BuildDetailsPage({ params }: { params: { id: string } })
       </Card>
       <div className="flex flex-wrap gap-3">
         <Button variant="danger" onClick={onDeleteBuild} disabled={deleting}>{deleting ? 'Удаление...' : 'Удалить сборку'}</Button>
-        <Link href={`/api/builds/${build.id}/export`} prefetch={false} className="inline-flex items-center justify-center rounded-lg bg-transparent px-4 py-2 text-sm font-medium text-slate-200 transition-colors hover:bg-slate-800">Экспорт JSON</Link>
+        <Button variant="ghost" onClick={async () => { if (!build || jsonExporting) return; setJsonExporting(true); try { const response = await fetch(`/api/builds/${build.id}/export`); if (!response.ok) throw new Error(); const blob = await response.blob(); const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href = url; link.download = `pc-build-${build.id}.json`; document.body.appendChild(link); link.click(); link.remove(); URL.revokeObjectURL(url); showToast('JSON успешно экспортирован.', 'success'); } catch (error) { console.error(error); setError('Не удалось скачать JSON-файл сборки.'); showToast('Ошибка экспорта JSON.', 'error'); } finally { setJsonExporting(false); } }} disabled={jsonExporting}>{jsonExporting ? 'Экспорт JSON...' : 'Экспорт JSON'}</Button>
         <Button variant="secondary" onClick={onExportPdf} disabled={pdfExporting}>{pdfExporting ? 'Экспорт PDF...' : 'Экспорт PDF'}</Button>
         <Link href="/saved-builds" className="inline-flex items-center justify-center rounded-lg bg-transparent px-4 py-2 text-sm font-medium text-slate-200 transition-colors hover:bg-slate-800">Назад к списку сборок</Link>
         <Link href="/manual-build" className="inline-flex items-center justify-center rounded-lg bg-transparent px-4 py-2 text-sm font-medium text-slate-200 transition-colors hover:bg-slate-800">Редактировать (TODO)</Link>

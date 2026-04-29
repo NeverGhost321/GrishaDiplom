@@ -7,7 +7,7 @@ const navItems = [
   { href: '/', label: 'Главная' },
   { href: '/auto-build', label: 'Автоподбор' },
   { href: '/manual-build', label: 'Ручная сборка' },
-  { href: '/catalog', label: 'Каталог' },
+  { href: '/components', label: 'Каталог' },
   { href: '/saved-builds', label: 'Сохранённые сборки' },
   { href: '/about', label: 'О проекте' }
 ];
