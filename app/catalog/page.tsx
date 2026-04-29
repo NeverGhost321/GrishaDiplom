@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ComponentCard } from '@/src/components/ui/ComponentCard';
+import { LoadingCard } from '@/src/components/ui/LoadingCard';
+import { useToast } from '@/src/components/ui/Toast';
 import type { CatalogCategory, CatalogFilters, ComponentsApiResponse } from '@/src/types/api';
 
 type CpuItem = {
@@ -52,6 +54,7 @@ export default function CatalogPage() {
   const [count, setCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { showToast } = useToast();
 
   const activeCategory = useMemo(() => CATEGORY_OPTIONS.find((option) => option.key === category) ?? CATEGORY_OPTIONS[0], [category]);
 
@@ -72,9 +75,11 @@ export default function CatalogPage() {
       setItems(data.items);
       setCount(data.count);
     } catch (requestError) {
+      console.error(requestError);
       setItems([]);
       setCount(0);
       setError(requestError instanceof Error ? requestError.message : 'Неизвестная ошибка при загрузке каталога.');
+      showToast('Ошибка загрузки данных.', 'error');
     } finally {
       setIsLoading(false);
     }
@@ -136,9 +141,9 @@ export default function CatalogPage() {
       <div className="flex gap-2"><button onClick={()=>setFilters(draftFilters)} className="rounded-lg bg-blue-500 px-3 py-2 text-sm font-medium text-slate-950">Применить фильтры</button><button onClick={()=>{setDraftFilters(INITIAL_FILTERS);setFilters(INITIAL_FILTERS);}} className="rounded-lg border border-slate-700 px-3 py-2 text-sm text-slate-300">Сбросить</button></div>
     </div>
     <div className="text-sm text-slate-300">Найдено элементов: <span className="font-semibold text-slate-100">{count}</span></div>
-    {isLoading ? <div className="rounded-xl border border-slate-800 bg-slate-900 p-5 text-slate-300">Загрузка данных...</div> : null}
+    {isLoading ? <LoadingCard label="Загрузка данных..." /> : null}
     {error ? <div className="rounded-xl border border-red-500/50 bg-red-950/20 p-5 text-red-200">{error}</div> : null}
-    {!isLoading && !error && items.length === 0 ? <div className="rounded-xl border border-slate-800 bg-slate-900 p-5 text-slate-300">По выбранным фильтрам ничего не найдено.</div> : null}
+    {!isLoading && !error && items.length === 0 ? <div className="rounded-xl border border-slate-800 bg-slate-900 p-5 text-slate-300">Каталог пуст. Проверьте, что seed-данные были загружены в базу данных.</div> : null}
     <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">{items.map((item)=><ComponentCard key={item.id} title={item.model} subtitle={('brand' in item && item.brand) ? item.brand : undefined} price={item.price} specs={renderSpecs(item)} />)}</div>
   </section>);
 }

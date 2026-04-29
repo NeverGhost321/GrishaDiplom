@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Navigation } from './components/navigation';
 import './globals.css';
+import { ToastProvider } from '@/src/components/ui/Toast';
 
 export const metadata: Metadata = {
   title: 'Конфигуратор игровых ПК',
@@ -24,7 +25,7 @@ export default function RootLayout({
             <Navigation />
           </div>
         </header>
-        <main className="mx-auto min-h-[calc(100vh-112px)] w-full max-w-6xl px-4 py-8 sm:px-6">{children}</main>
+        <main className="mx-auto min-h-[calc(100vh-112px)] w-full max-w-6xl px-4 py-8 sm:px-6"><ToastProvider>{children}</ToastProvider></main>
       </body>
     </html>
   );

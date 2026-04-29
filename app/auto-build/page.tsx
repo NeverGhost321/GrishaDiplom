@@ -7,6 +7,7 @@ import { Card } from '@/src/components/ui/Card';
 import { CompatibilityPanel } from '@/src/components/ui/CompatibilityPanel';
 import { ComponentCard } from '@/src/components/ui/ComponentCard';
 import { ProgressBar } from '@/src/components/ui/ProgressBar';
+import { useToast } from '@/src/components/ui/Toast';
 import type { AutoBuildApiResponse, AutoBuildResult } from '@/src/types/api';
 import type { BuildGenerationParams, SelectedBuildComponents } from '@/src/types/build';
 
@@ -150,6 +151,7 @@ export default function AutoBuildPage() {
   const [recommendations, setRecommendations] = useState<string[]>([]);
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const { showToast } = useToast();
 
   const cards = useMemo(() => (result ? componentCardsData(result.components) : []), [result]);
 
@@ -182,6 +184,7 @@ export default function AutoBuildPage() {
         setResult(null);
         if ('error' in data) {
           setError(data.error || 'Не удалось выполнить автоподбор.');
+          showToast('Ошибка генерации сборки.', 'error');
           setRecommendations(data.recommendations ?? []);
         } else {
           setError('Не удалось выполнить автоподбор.');
@@ -191,8 +194,10 @@ export default function AutoBuildPage() {
       }
 
       setResult(data.result);
-    } catch {
+    } catch (error) {
+      console.error(error);
       setError('Произошла ошибка сети при автоподборе сборки.');
+      showToast('Ошибка генерации сборки.', 'error');
       setResult(null);
     } finally {
       setLoading(false);
@@ -231,8 +236,11 @@ export default function AutoBuildPage() {
       }
 
       setSaveMessage('Сборка успешно сохранена.');
-    } catch {
+      showToast('Сборка успешно сохранена.', 'success');
+    } catch (error) {
+      console.error(error);
       setSaveError('Ошибка сети при сохранении сборки.');
+      showToast('Ошибка сохранения сборки.', 'error');
     } finally {
       setSaving(false);
     }
@@ -250,6 +258,7 @@ export default function AutoBuildPage() {
     anchor.click();
     document.body.removeChild(anchor);
     URL.revokeObjectURL(url);
+    showToast('JSON успешно экспортирован.', 'success');
   }
 
   return (

@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { Alert } from '@/src/components/ui/Alert';
 import { Button } from '@/src/components/ui/Button';
 import { Card } from '@/src/components/ui/Card';
+import { LoadingCard } from '@/src/components/ui/LoadingCard';
+import { useToast } from '@/src/components/ui/Toast';
 import type { SavedBuild, SavedBuildsApiResponse } from '@/src/types/build';
 
 const SORT_OPTIONS = [
@@ -39,6 +41,7 @@ export default function SavedBuildsPage() {
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [search, setSearch] = useState('');
   const [sortBy, setSortBy] = useState<SortOption>('date_desc');
+  const { showToast } = useToast();
 
   useEffect(() => {
     async function loadBuilds() {
@@ -52,7 +55,10 @@ export default function SavedBuildsPage() {
         }
         setBuilds(data.items);
       } catch (error) {
-        setLoadingError(error instanceof Error ? error.message : 'Не удалось получить сохранённые сборки.');
+        console.error(error);
+        const message = error instanceof Error ? error.message : 'Не удалось получить сохранённые сборки.';
+        setLoadingError(message);
+        showToast('Ошибка загрузки данных.', 'error');
       } finally {
         setLoading(false);
       }
@@ -101,9 +107,13 @@ export default function SavedBuildsPage() {
         return;
       }
       setBuilds((prev) => prev.filter((item) => item.id !== buildId));
-      setDeleteSuccess(data.message || 'Сборка успешно удалена.');
-    } catch {
+      const message = data.message || 'Сборка успешно удалена.';
+      setDeleteSuccess(message);
+      showToast(message, 'success');
+    } catch (error) {
+      console.error(error);
       setDeleteError('Ошибка сети при удалении сборки.');
+      showToast('Ошибка удаления сборки.', 'error');
     } finally {
       setDeletingId(null);
     }
@@ -147,12 +157,15 @@ export default function SavedBuildsPage() {
         </div>
       </Card>
 
-      {loading ? <p className="text-slate-300">Загружаем сохранённые сборки...</p> : null}
+      {loading ? <LoadingCard label="Загружаем сохранённые сборки..." /> : null}
 
       {!loading && !loadingError && filteredBuilds.length === 0 ? (
-        <Alert variant="info" title="Пока пусто">
-          Сохранённые сборки не найдены. Создайте сборку в разделе «Ручная сборка» или «Автоподбор».
-        </Alert>
+        <Card title="Пока нет сохранённых сборок" description="Создайте первую конфигурацию любым удобным способом.">
+          <div className="flex flex-wrap gap-3">
+            <Link href="/auto-build" className="inline-flex items-center justify-center rounded-lg bg-blue-500 px-3 py-2 text-sm font-medium text-white hover:bg-blue-400">Создать автоматическую сборку</Link>
+            <Link href="/manual-build" className="inline-flex items-center justify-center rounded-lg border border-slate-700 px-3 py-2 text-sm text-slate-100 hover:bg-slate-800">Собрать вручную</Link>
+          </div>
+        </Card>
       ) : null}
 
       {!loading && !loadingError && filteredBuilds.length > 0 ? (
