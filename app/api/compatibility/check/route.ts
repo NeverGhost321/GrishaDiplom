@@ -108,15 +108,48 @@ export async function POST(request: Request) {
       );
     }
 
+    const safeCpu = cpu as NonNullable<typeof cpu>;
+    const safeMotherboard = motherboard as NonNullable<typeof motherboard>;
+    const safeRam = ram as NonNullable<typeof ram>;
+    const safeGpu = gpu as NonNullable<typeof gpu>;
+    const safePsu = psu as NonNullable<typeof psu>;
+    const safeStorage = storage as NonNullable<typeof storage>;
+    const safePcCase = pcCase as NonNullable<typeof pcCase>;
+    const safeCooler = cooler as NonNullable<typeof cooler>;
+
     const components: SelectedBuildComponents = {
-      cpu: cpu as Cpu,
-      motherboard: motherboard as Motherboard,
-      ram: ram as Ram,
-      gpu: gpu as Gpu,
-      psu: psu as Psu,
-      storage: storage as Storage,
-      pcCase: pcCase as PcCase,
-      cooler: cooler as Cooler,
+      cpu: {
+        id: safeCpu.id,
+        name: safeCpu.model,
+        brand: safeCpu.brand,
+        socket: safeCpu.socket,
+        cores: safeCpu.cores,
+        threads: safeCpu.threads,
+        baseClockGhz: safeCpu.baseClockGhz,
+        boostClockGhz: safeCpu.boostClockGhz,
+        tdp: safeCpu.tdpWatts,
+        integratedGraphics: safeCpu.integratedGraphics,
+        generation: safeCpu.generation,
+        price: safeCpu.price,
+      } as Cpu,
+      motherboard: { ...safeMotherboard, name: safeMotherboard.model } as Motherboard,
+      ram: { ...safeRam, name: safeRam.model } as Ram,
+      gpu: {
+        id: safeGpu.id,
+        name: safeGpu.model,
+        brand: safeGpu.brand,
+        chipset: safeGpu.chipset,
+        vramGb: safeGpu.vramGb,
+        lengthMm: safeGpu.lengthMm,
+        powerConsumption: safeGpu.powerDrawWatts,
+        recommendedPsuWattage: safeGpu.recommendedPsuWatts,
+        pcieInterface: safeGpu.pcieInterface,
+        price: safeGpu.price,
+      } as Gpu,
+      psu: { ...safePsu, name: safePsu.model } as Psu,
+      storage: { ...safeStorage, name: safeStorage.model } as Storage,
+      pcCase: { ...safePcCase, name: safePcCase.model } as PcCase,
+      cooler: { ...safeCooler, name: safeCooler.model } as Cooler,
     };
 
     const result = checkCompatibility(components);

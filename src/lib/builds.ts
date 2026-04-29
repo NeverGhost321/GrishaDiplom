@@ -50,14 +50,14 @@ export async function loadComponentsByIds(ids: BuildComponentIds) {
   }
 
   const components: SelectedBuildComponents = {
-    cpu: cpu as Cpu,
-    motherboard: motherboard as Motherboard,
-    ram: ram as Ram,
-    gpu: gpu as Gpu,
-    psu: psu as Psu,
-    storage: storage as Storage,
-    pcCase: pcCase as PcCase,
-    cooler: cooler as Cooler,
+    cpu: cpu as unknown as Cpu,
+    motherboard: motherboard as unknown as Motherboard,
+    ram: ram as unknown as Ram,
+    gpu: gpu as unknown as Gpu,
+    psu: psu as unknown as Psu,
+    storage: storage as unknown as Storage,
+    pcCase: pcCase as unknown as PcCase,
+    cooler: cooler as unknown as Cooler,
   };
 
   return { components };
