@@ -8,5 +8,5 @@ export async function POST(request: Request) {
   const user = await prisma.user.findUnique({ where: { email: body.email.toLowerCase() } });
   if (!user || !verifyPassword(body.password, user.passwordHash)) return NextResponse.json({ error: 'Неверный email или пароль.' }, { status: 401 });
   await createSession(user.id);
-  return NextResponse.json({ user: { id: user.id, email: user.email, name: user.name, bio: user.bio, avatarUrl: user.avatarUrl } });
+  return NextResponse.json({ user: { id: user.id, email: user.email, name: user.name, bio: user.bio, avatarUrl: user.avatarUrl, role: user.role } });
 }

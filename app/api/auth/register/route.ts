@@ -14,5 +14,5 @@ export async function POST(request: Request) {
     data: { email: body.email.toLowerCase(), name: body.name.trim(), passwordHash: hashPassword(body.password) },
   });
   await createSession(user.id);
-  return NextResponse.json({ user: { id: user.id, email: user.email, name: user.name, bio: user.bio, avatarUrl: user.avatarUrl } }, { status: 201 });
+  return NextResponse.json({ user: { id: user.id, email: user.email, name: user.name, bio: user.bio, avatarUrl: user.avatarUrl, role: user.role } }, { status: 201 });
 }

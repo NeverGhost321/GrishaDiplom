@@ -16,6 +16,7 @@ model User {
   avatarUrl    String?
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
+  role         String    @default("USER")
   builds       Build[]
   sessions     Session[]
 }
