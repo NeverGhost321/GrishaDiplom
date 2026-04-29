@@ -252,3 +252,84 @@ Content-Type: application/json
 Сервис также формирует:
 - `explanation` на русском языке;
 - `alternatives` с альтернативными GPU/CPU/RAM/PSU.
+
+## API автоматического подбора
+
+Добавлен endpoint для автоматического подбора совместимой игровой сборки:
+
+- `POST /api/builds/generate`
+
+### Пример запроса
+
+```http
+POST /api/builds/generate
+Content-Type: application/json
+```
+
+```json
+{
+  "budget": 120000,
+  "targetResolution": "qhd",
+  "priority": "balanced",
+  "preferredBrands": ["AMD", "MSI"],
+  "excludedBrands": ["Palit"]
+}
+```
+
+### Пример успешного ответа
+
+```json
+{
+  "result": {
+    "components": {
+      "cpu": {},
+      "motherboard": {},
+      "ram": {},
+      "gpu": {},
+      "psu": {},
+      "storage": {},
+      "pcCase": {},
+      "cooler": {}
+    },
+    "totalPrice": 118500,
+    "compatibilityResult": {
+      "isCompatible": true,
+      "errors": [],
+      "warnings": [],
+      "recommendations": [],
+      "totalPowerConsumption": 390,
+      "requiredPsuWattage": 468,
+      "totalPrice": 118500,
+      "compatibilityScore": 93
+    },
+    "performanceScore": 86,
+    "explanation": "Сборка выбрана под 2K (QHD) с приоритетом «balanced». ...",
+    "alternatives": []
+  }
+}
+```
+
+### Пример ответа 400
+
+```json
+{
+  "error": "Некорректные параметры автоподбора.",
+  "details": [
+    "Поле budget должно быть числом.",
+    "Поле targetResolution должно быть одним из: fullhd, qhd, uhd."
+  ]
+}
+```
+
+### Пример ответа 404
+
+```json
+{
+  "error": "Не удалось подобрать совместимую сборку под заданные параметры.",
+  "recommendations": [
+    "Увеличьте бюджет.",
+    "Измените приоритет сборки.",
+    "Уберите часть ограничений по брендам."
+  ]
+}
+```
