@@ -7,7 +7,9 @@ const navItems = [
   { href: '/components', label: 'Каталог' },
   { href: '/auto-build', label: 'Автоподбор' },
   { href: '/manual-build', label: 'Ручная сборка' },
-  { href: '/saved-builds', label: 'Сохранённые сборки' }
+  { href: '/saved-builds', label: 'Сохранённые сборки' },
+  { href: '/login', label: 'Вход' },
+  { href: '/register', label: 'Регистрация' }
 ];
 
 export function Navigation() {
