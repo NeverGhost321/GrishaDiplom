@@ -8,7 +8,6 @@ export async function GET(request: Request) {
     const search = getStringParam(params, 'search');
     const manufacturer = getStringParam(params, 'manufacturer');
     const socket = getStringParam(params, 'socket');
-    const memoryType = getStringParam(params, 'memoryType');
 
     const where = {
       ...(search
@@ -21,12 +20,18 @@ export async function GET(request: Request) {
         : {}),
       ...(manufacturer ? { brand: { equals: manufacturer, mode: 'insensitive' as const } } : {}),
       ...(socket ? { socket: { contains: socket, mode: 'insensitive' as const } } : {}),
-      ...(memoryType ? { memoryType: { contains: memoryType, mode: 'insensitive' as const } } : {}),
       price: buildPriceFilter(params)
     };
 
     const items = await prisma.cpu.findMany({ where, orderBy: buildOrderBy(getSortOrder(params), 'brand') });
-    return NextResponse.json({ items, count: items.length });
+    return NextResponse.json({
+      items: items.map((item) => ({
+        ...item,
+        name: item.model,
+        tdp: item.tdpWatts,
+      })),
+      count: items.length
+    });
   } catch {
     return NextResponse.json({ error: 'Не удалось получить список комплектующих.' }, { status: 500 });
   }
