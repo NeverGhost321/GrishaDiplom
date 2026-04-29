@@ -333,3 +333,106 @@ Content-Type: application/json
   ]
 }
 ```
+
+## API сохранённых сборок
+
+Добавлены endpoint'ы для сохранения, просмотра, удаления и экспорта пользовательских сборок.
+
+- `GET /api/builds`
+- `POST /api/builds`
+- `DELETE /api/builds/:id`
+- `GET /api/builds/:id/export`
+
+### GET /api/builds
+
+Возвращает список сохранённых сборок (с компонентами), отсортированный по дате создания (новые сверху).
+
+Пример ответа:
+
+```json
+{
+  "items": [],
+  "count": 0
+}
+```
+
+### POST /api/builds
+
+Сохраняет сборку после валидации и проверки совместимости.
+
+Пример запроса:
+
+```json
+{
+  "name": "Сбалансированная сборка для 2K",
+  "budget": 120000,
+  "cpuId": 1,
+  "motherboardId": 1,
+  "ramId": 1,
+  "gpuId": 1,
+  "psuId": 1,
+  "storageId": 1,
+  "caseId": 1,
+  "coolerId": 1
+}
+```
+
+Пример успешного ответа (`201`):
+
+```json
+{
+  "item": {
+    "id": 1,
+    "name": "Сбалансированная сборка для 2K"
+  },
+  "compatibilityResult": {
+    "isCompatible": true,
+    "errors": [],
+    "warnings": []
+  }
+}
+```
+
+Если есть критические ошибки совместимости (`compatibilityResult.errors`), сборка **не сохраняется** и возвращается `400`.
+
+### DELETE /api/builds/:id
+
+Удаляет сохранённую сборку по ID.
+
+Пример ответа:
+
+```json
+{
+  "message": "Сборка успешно удалена."
+}
+```
+
+### GET /api/builds/:id/export
+
+Возвращает JSON-экспорт сборки с пересчитанным `compatibilityResult` и заголовком `Content-Disposition` для скачивания файла `pc-build-{id}.json`.
+
+Пример ответа:
+
+```json
+{
+  "project": "Конфигуратор игровых ПК",
+  "exportedAt": "2026-04-29T00:00:00.000Z",
+  "build": {
+    "name": "Сбалансированная сборка для 2K",
+    "budget": 120000,
+    "totalPrice": 118500,
+    "createdAt": "2026-04-29T00:00:00.000Z",
+    "components": {
+      "cpu": {},
+      "motherboard": {},
+      "ram": {},
+      "gpu": {},
+      "psu": {},
+      "storage": {},
+      "pcCase": {},
+      "cooler": {}
+    },
+    "compatibilityResult": {}
+  }
+}
+```
