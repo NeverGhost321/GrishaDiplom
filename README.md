@@ -114,3 +114,36 @@ npm run test:watch
 - ограничения по PCIe, предупреждения по BIOS и по частоте RAM;
 - отсутствие M.2 слотов для NVMe;
 - предупреждения по bottleneck CPU/GPU и отсутствию 12VHPWR для мощных видеокарт.
+
+## API комплектующих
+
+Доступны API-эндпоинты Next.js App Router для получения списков комплектующих из базы данных:
+
+- `GET /api/components/cpus`
+- `GET /api/components/motherboards`
+- `GET /api/components/rams`
+- `GET /api/components/gpus`
+- `GET /api/components/psus`
+- `GET /api/components/storages`
+- `GET /api/components/cases`
+- `GET /api/components/coolers`
+
+Каждый эндпоинт возвращает JSON вида:
+
+```json
+{
+  "items": [],
+  "count": 0
+}
+```
+
+Поддерживаются общие query-параметры:
+- `search` — поиск по производителю/модели;
+- `manufacturer` — фильтр по производителю;
+- `minPrice`, `maxPrice` — фильтр по цене;
+- `sort` — `price_asc`, `price_desc`, `manufacturer_asc`.
+
+Примеры запросов:
+- `GET /api/components/cpus`
+- `GET /api/components/gpus?minVramGb=8&sort=price_asc`
+- `GET /api/components/motherboards?socket=AM5&memoryType=DDR5`
