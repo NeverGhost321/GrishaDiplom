@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Navigation } from './components/navigation';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -15,12 +16,15 @@ export default function RootLayout({
   return (
     <html lang="ru">
       <body>
-        <header className="border-b border-slate-800 bg-slate-900/70">
-          <div className="mx-auto max-w-5xl px-6 py-4">
-            <h1 className="text-xl font-semibold text-primary">Конфигуратор игровых ПК</h1>
+        <header className="sticky top-0 z-20 border-b border-slate-800 bg-slate-950/90 backdrop-blur">
+          <div className="mx-auto max-w-6xl px-4 py-4 sm:px-6">
+            <div className="mb-3 flex items-center justify-between gap-4">
+              <h1 className="text-lg font-semibold text-blue-300 sm:text-xl">Конфигуратор игровых ПК</h1>
+            </div>
+            <Navigation />
           </div>
         </header>
-        <main className="mx-auto min-h-[calc(100vh-72px)] max-w-5xl px-6 py-8">{children}</main>
+        <main className="mx-auto min-h-[calc(100vh-112px)] w-full max-w-6xl px-4 py-8 sm:px-6">{children}</main>
       </body>
     </html>
   );
