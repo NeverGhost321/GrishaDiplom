@@ -4,6 +4,34 @@ import type { CompatibilityResult } from './compatibility';
 export type AutoBuildPriority = BuildGenerationParams['priority'];
 export type AutoBuildResolution = BuildGenerationParams['targetResolution'];
 
+export interface ComponentsApiResponse<T> {
+  items: T[];
+  count: number;
+  error?: string;
+}
+
+export interface SelectedIds {
+  cpuId: number | null;
+  motherboardId: number | null;
+  ramId: number | null;
+  gpuId: number | null;
+  psuId: number | null;
+  storageId: number | null;
+  caseId: number | null;
+  coolerId: number | null;
+}
+
+export interface CompatibilityCheckApiSuccessResponse {
+  result: CompatibilityResult;
+}
+
+export interface CompatibilityCheckApiErrorResponse {
+  error: string;
+  details?: string[];
+}
+
+export type CompatibilityCheckApiResponse = CompatibilityCheckApiSuccessResponse | CompatibilityCheckApiErrorResponse;
+
 export interface ComponentSummary {
   type: keyof SelectedBuildComponents;
   id: number;
