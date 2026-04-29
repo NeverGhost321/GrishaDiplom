@@ -99,7 +99,12 @@ export default function ManualBuildPage() {
   const [compatibilityResult, setCompatibilityResult] = useState<CompatibilityResult | null>(null);
   const [saveLoading, setSaveLoading] = useState(false);
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const { showToast } = useToast();
+
+  useEffect(() => {
+    void fetch('/api/auth/me').then((r) => setIsAuthenticated(r.ok)).catch(() => setIsAuthenticated(false));
+  }, []);
 
   useEffect(() => {
     async function loadAll() {
@@ -283,7 +288,7 @@ export default function ManualBuildPage() {
       </Card>
 
       <div className="flex flex-wrap gap-3">
-        <Button onClick={onSaveBuild} disabled={!canSave || saveLoading}>{saveLoading ? 'Сохраняем...' : 'Сохранить сборку'}</Button>
+        {isAuthenticated ? <Button onClick={onSaveBuild} disabled={!canSave || saveLoading}>{saveLoading ? 'Сохраняем...' : 'Сохранить сборку'}</Button> : <p className="text-sm text-slate-500">Сохранение доступно только авторизованным пользователям.</p>}
         <Button variant="ghost" onClick={onExportJson} disabled={!allSelected}>Экспортировать JSON</Button>
       </div>
     </section>

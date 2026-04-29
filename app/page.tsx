@@ -1,44 +1,36 @@
 import Link from 'next/link';
-import { Card } from '@/src/components/ui/Card';
 import { Button } from '@/src/components/ui/Button';
+import { Card } from '@/src/components/ui/Card';
+
+const features = [
+  ['Проверка совместимости', 'Автоматическая валидация компонентов и предупреждения о конфликте.'],
+  ['Подбор по бюджету', 'Оптимизация конфигурации под заданную сумму и разрешение.'],
+  ['Расчёт энергопотребления', 'Оценка нагрузки и запаса мощности блока питания.'],
+  ['Экспорт конфигурации', 'Скачивание сборки в JSON и PDF форматах.']
+];
 
 export default function HomePage() {
   return (
-    <section className="space-y-8">
-      <Card className="space-y-4" title="Конфигуратор игровых ПК" description="Веб-приложение для подбора совместимых игровых конфигураций.">
-        <p className="text-slate-300">
-          Проект разработан как практическая часть ВКР и демонстрирует проверку аппаратной совместимости комплектующих, оценку баланса системы и поддержку процесса выбора оптимальной конфигурации.
-        </p>
+    <section className="space-y-10">
+      <Card className="space-y-6 p-8">
+        <div className="max-w-3xl space-y-4">
+          <p className="text-sm font-medium uppercase tracking-wide text-slate-500">Игровой PC-конфигуратор</p>
+          <h2 className="text-4xl font-semibold leading-tight text-slate-900 sm:text-5xl">Собирайте игровые ПК быстро, прозрачно и без ошибок совместимости</h2>
+          <p className="text-base text-slate-600">Подбирайте комплектующие автоматически или вручную, контролируйте бюджет, мощность и итоговую стоимость в едином интерфейсе.</p>
+        </div>
         <div className="flex flex-wrap gap-3">
-          <Link href="/auto-build" data-testid="cta-auto-build"><Button size="lg">Подобрать игровой ПК</Button></Link>
-          <Link href="/manual-build" data-testid="cta-manual-build"><Button size="lg" variant="secondary">Собрать вручную</Button></Link>
+          <Link href="/auto-build"><Button size="lg">Автоматический подбор</Button></Link>
+          <Link href="/manual-build"><Button size="lg" variant="ghost">Ручная сборка</Button></Link>
         </div>
       </Card>
 
-      <Card title="Что проверяет приложение">
-        <ul className="list-inside list-disc space-y-1 text-slate-300">
-          <li>совместимость CPU и материнской платы;</li>
-          <li>тип и частоту RAM;</li>
-          <li>мощность блока питания;</li>
-          <li>PCIe и накопители;</li>
-          <li>габариты корпуса;</li>
-          <li>охлаждение;</li>
-          <li>баланс CPU и GPU.</li>
-        </ul>
-      </Card>
-
-      <Card title="Для чего это нужно">
-        <ul className="list-inside list-disc space-y-1 text-slate-300">
-          <li>снижение риска ошибок при сборке;</li>
-          <li>подбор конфигурации по бюджету;</li>
-          <li>объяснение предупреждений и ограничений;</li>
-          <li>демонстрация практической части ВКР.</li>
-        </ul>
-      </Card>
-
-      <div className="flex flex-wrap gap-4 text-sm">
-        <Link href="/catalog" data-testid="cta-catalog" className="text-blue-300 hover:text-blue-200">Перейти в каталог комплектующих →</Link>
-        <Link href="/about" className="text-blue-300 hover:text-blue-200">Подробнее о проекте →</Link>
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        {features.map(([title, text]) => (
+          <Card key={title} className="h-full">
+            <h3 className="text-base font-semibold text-slate-900">{title}</h3>
+            <p className="mt-2 text-sm text-slate-600">{text}</p>
+          </Card>
+        ))}
       </div>
     </section>
   );

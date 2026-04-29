@@ -5,14 +5,10 @@ import { usePathname } from 'next/navigation';
 
 const navItems = [
   { href: '/', label: 'Главная' },
+  { href: '/components', label: 'Каталог' },
   { href: '/auto-build', label: 'Автоподбор' },
   { href: '/manual-build', label: 'Ручная сборка' },
-  { href: '/components', label: 'Каталог' },
-  { href: '/saved-builds', label: 'Сохранённые сборки' },
-  { href: '/account', label: 'Личный кабинет' },
-  { href: '/login', label: 'Вход' },
-  { href: '/register', label: 'Регистрация' },
-  { href: '/about', label: 'О проекте' }
+  { href: '/saved-builds', label: 'Сборки' }
 ];
 
 export function Navigation() {
@@ -20,20 +16,14 @@ export function Navigation() {
 
   return (
     <nav aria-label="Основная навигация" className="overflow-x-auto">
-      <ul className="flex min-w-max items-center gap-2 py-1">
+      <ul className="flex min-w-max items-center gap-2">
         {navItems.map((item) => {
-          const isActive =
-            item.href === '/' ? pathname === item.href : pathname?.startsWith(item.href);
-
+          const isActive = item.href === '/' ? pathname === '/' : pathname?.startsWith(item.href);
           return (
             <li key={item.href}>
               <Link
                 href={item.href}
-                className={`rounded-lg px-3 py-2 text-sm transition-colors ${
-                  isActive
-                    ? 'bg-blue-500/20 text-blue-300'
-                    : 'text-slate-300 hover:bg-slate-800 hover:text-slate-100'
-                }`}
+                className={`rounded-lg px-3 py-2 text-sm transition-colors ${isActive ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}`}
               >
                 {item.label}
               </Link>

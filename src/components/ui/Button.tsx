@@ -7,10 +7,10 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variantClasses: Record<NonNullable<ButtonProps['variant']>, string> = {
-  primary: 'bg-blue-500 text-white hover:bg-blue-400',
-  secondary: 'bg-slate-800 text-slate-100 hover:bg-slate-700',
-  danger: 'bg-red-500 text-white hover:bg-red-400',
-  ghost: 'bg-transparent text-slate-200 hover:bg-slate-800'
+  primary: 'bg-blue-700 text-white hover:bg-blue-800',
+  secondary: 'bg-slate-900 text-white hover:bg-slate-800',
+  danger: 'bg-red-600 text-white hover:bg-red-700',
+  ghost: 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-300'
 };
 
 const sizeClasses: Record<NonNullable<ButtonProps['size']>, string> = {
@@ -19,17 +19,10 @@ const sizeClasses: Record<NonNullable<ButtonProps['size']>, string> = {
   lg: 'px-5 py-3 text-base'
 };
 
-export function Button({
-  children,
-  variant = 'primary',
-  size = 'md',
-  className = '',
-  disabled,
-  ...props
-}: ButtonProps) {
+export function Button({ children, variant = 'primary', size = 'md', className = '', disabled, ...props }: ButtonProps) {
   return (
     <button
-      className={`inline-flex items-center justify-center rounded-lg font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-400 disabled:cursor-not-allowed disabled:opacity-50 ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
+      className={`inline-flex items-center justify-center rounded-lg font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700 disabled:cursor-not-allowed disabled:opacity-50 ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
       disabled={disabled}
       {...props}
     >
