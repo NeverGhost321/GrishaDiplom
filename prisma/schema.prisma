@@ -7,11 +7,144 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Component {
-  id        Int      @id @default(autoincrement())
-  type      String
-  brand     String
-  model     String
-  price     Int
-  createdAt DateTime @default(now())
+model Cpu {
+  id                 Int      @id @default(autoincrement())
+  model              String
+  brand              String
+  socket             String
+  cores              Int
+  threads            Int
+  baseClockGhz       Float
+  boostClockGhz      Float
+  tdpWatts           Int
+  integratedGraphics Boolean
+  generation         String
+  price              Int
+  builds             Build[]
+}
+
+model Motherboard {
+  id                          Int      @id @default(autoincrement())
+  model                       String
+  socket                      String
+  chipset                     String
+  supportedCpuGenerations     String
+  memoryType                  String
+  maxRamGb                    Int
+  maxRamFrequency             Int
+  ramSlots                    Int
+  pcieVersion                 String
+  m2Slots                     Int
+  sataPorts                   Int
+  formFactor                  String
+  vrmQualityScore             Int
+  biosVersion                 String
+  price                       Int
+  builds                      Build[]
+}
+
+model Ram {
+  id           Int      @id @default(autoincrement())
+  model        String
+  memoryType   String
+  capacityGb   Int
+  sticks       Int
+  frequencyMhz Int
+  cl           Int
+  voltage      Float
+  rgb          Boolean
+  price        Int
+  builds       Build[]
+}
+
+model Gpu {
+  id                  Int      @id @default(autoincrement())
+  model               String
+  brand               String
+  chipset             String
+  vramGb              Int
+  lengthMm            Int
+  powerDrawWatts      Int
+  recommendedPsuWatts Int
+  pcieInterface       String
+  price               Int
+  builds              Build[]
+}
+
+model Psu {
+  id               Int      @id @default(autoincrement())
+  model            String
+  wattage          Int
+  efficiencyRating String
+  has12Vhpwr       Boolean
+  pcie8PinCount    Int
+  atxVersion       String
+  modular          Boolean
+  price            Int
+  builds           Build[]
+}
+
+model Storage {
+  id            Int      @id @default(autoincrement())
+  model         String
+  type          String
+  interface     String
+  capacityGb    Int
+  readSpeedMBs  Int
+  writeSpeedMBs Int
+  formFactor    String
+  price         Int
+  builds        Build[]
+}
+
+model PcCase {
+  id                               Int      @id @default(autoincrement())
+  model                            String
+  formFactor                       String
+  supportedMotherboardFormFactors  String
+  maxGpuLengthMm                   Int
+  maxCpuCoolerHeightMm             Int
+  radiatorSupport                  String
+  fanCountIncluded                 Int
+  airflowScore                     Int
+  price                            Int
+  builds                           Build[] @relation("BuildCase")
+}
+
+model Cooler {
+  id               Int      @id @default(autoincrement())
+  model            String
+  type             String
+  supportedSockets String
+  tdpRatingWatts   Int
+  heightMm         Int
+  radiatorSizeMm   Int
+  noiseLevelDb     Int
+  price            Int
+  builds           Build[]
+}
+
+model Build {
+  id            Int      @id @default(autoincrement())
+  name          String
+  budget        Int
+  totalPrice    Int
+  createdAt     DateTime @default(now())
+  cpuId         Int
+  motherboardId Int
+  ramId         Int
+  gpuId         Int
+  psuId         Int
+  storageId     Int
+  caseId        Int
+  coolerId      Int
+
+  cpu         Cpu         @relation(fields: [cpuId], references: [id])
+  motherboard Motherboard @relation(fields: [motherboardId], references: [id])
+  ram         Ram         @relation(fields: [ramId], references: [id])
+  gpu         Gpu         @relation(fields: [gpuId], references: [id])
+  psu         Psu         @relation(fields: [psuId], references: [id])
+  storage     Storage     @relation(fields: [storageId], references: [id])
+  pcCase      PcCase      @relation("BuildCase", fields: [caseId], references: [id])
+  cooler      Cooler      @relation(fields: [coolerId], references: [id])
 }

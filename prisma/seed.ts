@@ -5,7 +5,6 @@ const prisma = new PrismaClient();
 async function main() {
   // Очищаем таблицы с учётом потенциальных внешних ключей на конфигурации
   await prisma.$transaction([
-    prisma.$executeRawUnsafe('DELETE FROM "Configuration";'),
     prisma.$executeRawUnsafe('DELETE FROM "Cooler";'),
     prisma.$executeRawUnsafe('DELETE FROM "PcCase";'),
     prisma.$executeRawUnsafe('DELETE FROM "Storage";'),
@@ -18,7 +17,7 @@ async function main() {
 
   // CPU
   await prisma.$executeRawUnsafe(`
-    INSERT INTO "Cpu" (name, brand, socket, cores, threads, baseClockGhz, boostClockGhz, tdpWatts, integratedGraphics, generation, price) VALUES
+    INSERT INTO "Cpu" (model, brand, socket, cores, threads, baseClockGhz, boostClockGhz, tdpWatts, integratedGraphics, generation, price) VALUES
     ('Intel Core i5-12400F', 'Intel', 'LGA1700', 6, 12, 2.5, 4.4, 65, 0, '12th Gen', 16500),
     ('Intel Core i5-13600K', 'Intel', 'LGA1700', 14, 20, 3.5, 5.1, 125, 1, '13th Gen', 26500),
     ('Intel Core i7-14700K', 'Intel', 'LGA1700', 20, 28, 3.4, 5.6, 125, 1, '14th Gen', 45500),
@@ -31,7 +30,7 @@ async function main() {
 
   // Motherboard
   await prisma.$executeRawUnsafe(`
-    INSERT INTO "Motherboard" (name, socket, chipset, supportedCpuGenerations, memoryType, maxRamGb, maxRamFrequency, ramSlots, pcieVersion, m2Slots, sataPorts, formFactor, vrmQualityScore, biosVersion, price) VALUES
+    INSERT INTO "Motherboard" (model, socket, chipset, supportedCpuGenerations, memoryType, maxRamGb, maxRamFrequency, ramSlots, pcieVersion, m2Slots, sataPorts, formFactor, vrmQualityScore, biosVersion, price) VALUES
     ('MSI PRO B660M-A DDR4', 'LGA1700', 'B660', '12th Gen,13th Gen', 'DDR4', 128, 4800, 4, '4.0', 2, 6, 'mATX', 72, '7D43v1F', 12500),
     ('ASUS TUF GAMING Z790-PLUS WIFI', 'LGA1700', 'Z790', '12th Gen,13th Gen,14th Gen', 'DDR5', 192, 7200, 4, '5.0', 4, 4, 'ATX', 90, '1801', 29900),
     ('Gigabyte B760M DS3H DDR4', 'LGA1700', 'B760', '12th Gen,13th Gen,14th Gen', 'DDR4', 128, 5333, 4, '4.0', 2, 4, 'mATX', 68, 'F12', 11900),
@@ -43,7 +42,7 @@ async function main() {
   `);
 
   await prisma.$executeRawUnsafe(`
-    INSERT INTO "Ram" (name, memoryType, capacityGb, sticks, frequencyMhz, cl, voltage, rgb, price) VALUES
+    INSERT INTO "Ram" (model, memoryType, capacityGb, sticks, frequencyMhz, cl, voltage, rgb, price) VALUES
     ('Kingston Fury Beast 16GB (2x8) DDR4-3200', 'DDR4', 16, 2, 3200, 16, 1.35, 0, 5200),
     ('Corsair Vengeance LPX 32GB (2x16) DDR4-3200', 'DDR4', 32, 2, 3200, 16, 1.35, 0, 8800),
     ('G.Skill Ripjaws V 32GB (2x16) DDR4-3600', 'DDR4', 32, 2, 3600, 18, 1.35, 0, 9400),
@@ -55,7 +54,7 @@ async function main() {
   `);
 
   await prisma.$executeRawUnsafe(`
-    INSERT INTO "Gpu" (name, brand, chipset, vramGb, lengthMm, powerDrawWatts, recommendedPsuWatts, pcieInterface, price) VALUES
+    INSERT INTO "Gpu" (model, brand, chipset, vramGb, lengthMm, powerDrawWatts, recommendedPsuWatts, pcieInterface, price) VALUES
     ('NVIDIA RTX 3060', 'NVIDIA', 'RTX 3060', 12, 242, 170, 550, '4.0 x16', 31500),
     ('NVIDIA RTX 4060', 'NVIDIA', 'RTX 4060', 8, 244, 115, 500, '4.0 x8', 35900),
     ('NVIDIA RTX 4070', 'NVIDIA', 'RTX 4070', 12, 300, 200, 650, '4.0 x16', 61900),
@@ -67,7 +66,7 @@ async function main() {
   `);
 
   await prisma.$executeRawUnsafe(`
-    INSERT INTO "Psu" (name, wattage, efficiencyRating, has12Vhpwr, pcie8PinCount, atxVersion, modular, price) VALUES
+    INSERT INTO "Psu" (model, wattage, efficiencyRating, has12Vhpwr, pcie8PinCount, atxVersion, modular, price) VALUES
     ('Cooler Master MWE Bronze V2 500', 500, '80+ Bronze', 0, 2, 'ATX 2.52', 0, 4900),
     ('DeepCool PM650D Gold', 650, '80+ Gold', 0, 4, 'ATX 2.52', 0, 7900),
     ('be quiet! Pure Power 12 M 750W', 750, '80+ Gold', 1, 4, 'ATX 3.0', 1, 12100),
@@ -77,7 +76,7 @@ async function main() {
   `);
 
   await prisma.$executeRawUnsafe(`
-    INSERT INTO "Storage" (name, type, interface, capacityGb, readSpeedMBs, writeSpeedMBs, formFactor, price) VALUES
+    INSERT INTO "Storage" (model, type, interface, capacityGb, readSpeedMBs, writeSpeedMBs, formFactor, price) VALUES
     ('Samsung 870 EVO 500GB', 'SSD', 'SATA 6Gb/s', 500, 560, 530, '2.5"', 5400),
     ('Crucial MX500 1TB', 'SSD', 'SATA 6Gb/s', 1000, 560, 510, '2.5"', 8900),
     ('WD Blue SN570 500GB', 'SSD', 'NVMe PCIe 3.0 x4', 500, 3500, 2300, 'M.2 2280', 4800),
@@ -87,7 +86,7 @@ async function main() {
   `);
 
   await prisma.$executeRawUnsafe(`
-    INSERT INTO "PcCase" (name, formFactor, supportedMotherboardFormFactors, maxGpuLengthMm, maxCpuCoolerHeightMm, radiatorSupport, fanCountIncluded, airflowScore, price) VALUES
+    INSERT INTO "PcCase" (model, formFactor, supportedMotherboardFormFactors, maxGpuLengthMm, maxCpuCoolerHeightMm, radiatorSupport, fanCountIncluded, airflowScore, price) VALUES
     ('DeepCool MATREXX 30 SI', 'compact mATX', 'mATX,Mini-ITX', 250, 151, '120', 1, 45, 3900),
     ('Zalman i3 NEO', 'mid tower ATX', 'ATX,mATX,Mini-ITX', 355, 160, '240', 4, 70, 6200),
     ('Lian Li LANCOOL 216', 'large ATX', 'E-ATX,ATX,mATX,Mini-ITX', 392, 180, '360', 3, 90, 12400),
@@ -97,7 +96,7 @@ async function main() {
   `);
 
   await prisma.$executeRawUnsafe(`
-    INSERT INTO "Cooler" (name, type, supportedSockets, tdpRatingWatts, heightMm, radiatorSizeMm, noiseLevelDb, price) VALUES
+    INSERT INTO "Cooler" (model, type, supportedSockets, tdpRatingWatts, heightMm, radiatorSizeMm, noiseLevelDb, price) VALUES
     ('DeepCool GAMMAXX 200 V2', 'Air', 'LGA1700,AM4', 95, 131, 0, 30, 1900),
     ('ID-COOLING SE-224-XTS', 'Air', 'LGA1700,AM4,AM5', 180, 154, 0, 28, 3200),
     ('Thermalright Peerless Assassin 120 SE', 'Air', 'LGA1700,AM4,AM5', 250, 155, 0, 27, 5200),
