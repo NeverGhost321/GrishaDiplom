@@ -182,9 +182,7 @@ export default function SavedBuildsPage() {
                 </ul>
 
                 <div className="mt-auto flex flex-wrap gap-2">
-                  <Button variant="secondary" size="sm" disabled title="Страница детального просмотра сборки пока недоступна">
-                    Открыть
-                  </Button>
+                  <Link href={`/builds/${build.id}`} className="inline-flex items-center justify-center rounded-lg bg-slate-700 px-3 py-1.5 text-sm font-medium text-slate-100 transition-colors hover:bg-slate-600">Открыть</Link>
                   <Link
                     href={`/api/builds/${build.id}/export`}
                     prefetch={false}
