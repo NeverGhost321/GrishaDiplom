@@ -10,8 +10,8 @@ export default function HomePage() {
           Проект разработан как практическая часть ВКР и демонстрирует проверку аппаратной совместимости комплектующих, оценку баланса системы и поддержку процесса выбора оптимальной конфигурации.
         </p>
         <div className="flex flex-wrap gap-3">
-          <Link href="/auto-build"><Button size="lg">Подобрать игровой ПК</Button></Link>
-          <Link href="/manual-build"><Button size="lg" variant="secondary">Собрать вручную</Button></Link>
+          <Link href="/auto-build" data-testid="cta-auto-build"><Button size="lg">Подобрать игровой ПК</Button></Link>
+          <Link href="/manual-build" data-testid="cta-manual-build"><Button size="lg" variant="secondary">Собрать вручную</Button></Link>
         </div>
       </Card>
 
@@ -37,7 +37,7 @@ export default function HomePage() {
       </Card>
 
       <div className="flex flex-wrap gap-4 text-sm">
-        <Link href="/catalog" className="text-blue-300 hover:text-blue-200">Перейти в каталог комплектующих →</Link>
+        <Link href="/catalog" data-testid="cta-catalog" className="text-blue-300 hover:text-blue-200">Перейти в каталог комплектующих →</Link>
         <Link href="/about" className="text-blue-300 hover:text-blue-200">Подробнее о проекте →</Link>
       </div>
     </section>
