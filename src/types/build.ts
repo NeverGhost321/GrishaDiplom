@@ -37,3 +37,25 @@ export interface GeneratedBuildResult {
   explanation: string;
   alternatives: Partial<SelectedBuildComponents>[];
 }
+
+export interface SavedBuild {
+  id: number;
+  name: string;
+  budget: number;
+  totalPrice: number;
+  createdAt: string;
+  cpu: Cpu;
+  motherboard: Motherboard;
+  ram: Ram;
+  gpu: Gpu;
+  psu: Psu;
+  storage: Storage;
+  pcCase: PcCase;
+  cooler: Cooler | null;
+}
+
+export interface SavedBuildsApiResponse {
+  items: SavedBuild[];
+  count: number;
+  error?: string;
+}

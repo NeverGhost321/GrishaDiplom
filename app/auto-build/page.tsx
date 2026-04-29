@@ -180,8 +180,13 @@ export default function AutoBuildPage() {
 
       if (!response.ok || !('result' in data)) {
         setResult(null);
-        setError(data.error || 'Не удалось выполнить автоподбор.');
-        setRecommendations(data.recommendations ?? []);
+        if ('error' in data) {
+          setError(data.error || 'Не удалось выполнить автоподбор.');
+          setRecommendations(data.recommendations ?? []);
+        } else {
+          setError('Не удалось выполнить автоподбор.');
+          setRecommendations([]);
+        }
         return;
       }
 

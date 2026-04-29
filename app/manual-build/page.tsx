@@ -102,7 +102,7 @@ export default function ManualBuildPage() {
         const data = (await response.json()) as CompatibilityCheckApiResponse;
         if (!response.ok || !('result' in data)) {
           setCompatibilityResult(null);
-          setCompatibilityError(data.error || 'Не удалось выполнить проверку совместимости.');
+          setCompatibilityError('error' in data ? data.error || 'Не удалось выполнить проверку совместимости.' : 'Не удалось выполнить проверку совместимости.');
           return;
         }
         setCompatibilityResult(data.result);
@@ -191,7 +191,7 @@ export default function ManualBuildPage() {
       <Card title="Выбор комплектующих" description="Выберите компоненты для ручной проверки совместимости.">
         {loading ? <p className="text-slate-300">Загружаем списки комплектующих...</p> : (
           <div className="grid gap-4 md:grid-cols-2">
-            <Select label="Процессор" value={selected.cpuId} onChange={(v) => updateSelect('cpuId', v)} options={components.cpus.map((item) => ({ value: item.id, label: `${item.brand} ${item.name} — ${item.socket}, ${item.memoryType}, ${item.tdp} Вт — ${item.price.toLocaleString('ru-RU')} ₽` }))} />
+            <Select label="Процессор" value={selected.cpuId} onChange={(v) => updateSelect('cpuId', v)} options={components.cpus.map((item) => ({ value: item.id, label: `${item.brand} ${item.name} — ${item.socket}, ${item.tdp} Вт — ${item.price.toLocaleString('ru-RU')} ₽` }))} />
             <Select label="Материнская плата" value={selected.motherboardId} onChange={(v) => updateSelect('motherboardId', v)} options={components.motherboards.map((item) => ({ value: item.id, label: `${item.name} — ${item.socket}, ${item.memoryType}, ${item.formFactor} — ${item.price.toLocaleString('ru-RU')} ₽` }))} />
             <Select label="Оперативная память" value={selected.ramId} onChange={(v) => updateSelect('ramId', v)} options={components.rams.map((item) => ({ value: item.id, label: `${item.name} — ${item.memoryType}, ${item.capacityGb} ГБ, ${item.frequencyMhz} МГц — ${item.price.toLocaleString('ru-RU')} ₽` }))} />
             <Select label="Видеокарта" value={selected.gpuId} onChange={(v) => updateSelect('gpuId', v)} options={components.gpus.map((item) => ({ value: item.id, label: `${item.brand} ${item.name} — ${item.vramGb} ГБ, ${item.powerConsumption} Вт — ${item.price.toLocaleString('ru-RU')} ₽` }))} />
@@ -211,7 +211,7 @@ export default function ManualBuildPage() {
 
       <Card title="Текущая конфигурация">
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          <ComponentCard title="CPU" subtitle={selectedComponents.cpu ? `${selectedComponents.cpu.brand} ${selectedComponents.cpu.name}` : 'Не выбран'} price={selectedComponents.cpu?.price} specs={selectedComponents.cpu ? [{ label: 'Сокет', value: selectedComponents.cpu.socket }, { label: 'Память', value: selectedComponents.cpu.memoryType }, { label: 'TDP', value: `${selectedComponents.cpu.tdp} Вт` }] : []} />
+          <ComponentCard title="CPU" subtitle={selectedComponents.cpu ? `${selectedComponents.cpu.brand} ${selectedComponents.cpu.name}` : 'Не выбран'} price={selectedComponents.cpu?.price} specs={selectedComponents.cpu ? [{ label: 'Сокет', value: selectedComponents.cpu.socket }, { label: 'TDP', value: `${selectedComponents.cpu.tdp} Вт` }] : []} />
           <ComponentCard title="Motherboard" subtitle={selectedComponents.motherboard?.name ?? 'Не выбрана'} price={selectedComponents.motherboard?.price} specs={selectedComponents.motherboard ? [{ label: 'Сокет', value: selectedComponents.motherboard.socket }, { label: 'Память', value: selectedComponents.motherboard.memoryType }, { label: 'Форм-фактор', value: selectedComponents.motherboard.formFactor }] : []} />
           <ComponentCard title="RAM" subtitle={selectedComponents.ram?.name ?? 'Не выбрана'} price={selectedComponents.ram?.price} specs={selectedComponents.ram ? [{ label: 'Тип', value: selectedComponents.ram.memoryType }, { label: 'Объём', value: `${selectedComponents.ram.capacityGb} ГБ` }, { label: 'Частота', value: `${selectedComponents.ram.frequencyMhz} МГц` }] : []} />
           <ComponentCard title="GPU" subtitle={selectedComponents.gpu ? `${selectedComponents.gpu.brand} ${selectedComponents.gpu.name}` : 'Не выбрана'} price={selectedComponents.gpu?.price} specs={selectedComponents.gpu ? [{ label: 'VRAM', value: `${selectedComponents.gpu.vramGb} ГБ` }, { label: 'Потребление', value: `${selectedComponents.gpu.powerConsumption} Вт` }, { label: 'PCIe', value: selectedComponents.gpu.pcieInterface }] : []} />
