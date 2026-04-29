@@ -1,12 +1,11 @@
 'use client';
 
-import { FormEvent, useMemo, useState } from 'react';
+import { FormEvent, useEffect, useMemo, useState } from 'react';
 import { Alert } from '@/src/components/ui/Alert';
 import { Button } from '@/src/components/ui/Button';
 import { Card } from '@/src/components/ui/Card';
 import { CompatibilityPanel } from '@/src/components/ui/CompatibilityPanel';
 import { ComponentCard } from '@/src/components/ui/ComponentCard';
-import { ProgressBar } from '@/src/components/ui/ProgressBar';
 import { useToast } from '@/src/components/ui/Toast';
 import type { AutoBuildApiResponse, AutoBuildResult } from '@/src/types/api';
 import type { BuildGenerationParams, SelectedBuildComponents } from '@/src/types/build';
@@ -151,9 +150,14 @@ export default function AutoBuildPage() {
   const [recommendations, setRecommendations] = useState<string[]>([]);
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const { showToast } = useToast();
 
   const cards = useMemo(() => (result ? componentCardsData(result.components) : []), [result]);
+
+  useEffect(() => {
+    void fetch('/api/auth/me').then((r) => setIsAuthenticated(r.ok)).catch(() => setIsAuthenticated(false));
+  }, []);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -375,7 +379,6 @@ export default function AutoBuildPage() {
               <p className="sm:col-span-2 lg:col-span-3">Приоритет: {PRIORITY_LABELS[priority]}</p>
             </div>
             <div className="mt-4 max-w-md">
-              <ProgressBar value={result.performanceScore} label="Индекс производительности" />
             </div>
           </Card>
 
@@ -409,7 +412,7 @@ export default function AutoBuildPage() {
           {saveError ? <Alert variant="danger">{saveError}</Alert> : null}
 
           <div className="flex flex-wrap gap-3">
-            <Button onClick={saveBuild} disabled={saving}>{saving ? 'Сохраняем сборку...' : 'Сохранить сборку'}</Button>
+            {isAuthenticated ? <Button onClick={saveBuild} disabled={saving}>{saving ? 'Сохраняем сборку...' : 'Сохранить сборку'}</Button> : <p className="text-sm text-slate-500">Сохранение доступно только авторизованным пользователям.</p>}
             <Button variant="secondary" onClick={exportJson}>Экспортировать JSON</Button>
           </div>
         </div>
