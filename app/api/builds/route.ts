@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { checkCompatibility } from '@/src/services/compatibility.service';
 import { loadComponentsByIds, type BuildComponentIds } from '@/src/lib/builds';
+import { getCurrentUser } from '@/lib/auth';
 
 type CreateBuildRequestBody = BuildComponentIds & {
   name: string;
@@ -49,8 +50,11 @@ function validateBody(body: unknown): { isValid: boolean; details: string[] } {
 }
 
 export async function GET() {
+  const user = await getCurrentUser();
+  if (!user) return NextResponse.json({ error: 'Требуется авторизация.' }, { status: 401 });
   try {
     const items = await prisma.build.findMany({
+      where: { userId: user.id },
       include: { cpu: true, motherboard: true, ram: true, gpu: true, psu: true, storage: true, pcCase: true, cooler: true },
       orderBy: { createdAt: 'desc' },
     });
@@ -62,6 +66,8 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const user = await getCurrentUser();
+  if (!user) return NextResponse.json({ error: 'Требуется авторизация.' }, { status: 401 });
   try {
     const body: unknown = await request.json();
     const validation = validateBody(body);
@@ -89,6 +95,7 @@ export async function POST(request: Request) {
     const item = await prisma.build.create({
       data: {
         name: payload.name.trim(),
+        userId: user.id,
         budget: payload.budget,
         totalPrice: compatibilityResult.totalPrice,
         cpuId: payload.cpuId,
