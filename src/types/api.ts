@@ -4,6 +4,25 @@ import type { CompatibilityResult } from './compatibility';
 export type AutoBuildPriority = BuildGenerationParams['priority'];
 export type AutoBuildResolution = BuildGenerationParams['targetResolution'];
 
+
+export type CatalogCategory =
+  | 'cpus'
+  | 'motherboards'
+  | 'rams'
+  | 'gpus'
+  | 'psus'
+  | 'storages'
+  | 'cases'
+  | 'coolers';
+
+export interface CatalogFilters {
+  search: string;
+  manufacturer: string;
+  sort: 'price_asc' | 'price_desc' | 'manufacturer_asc';
+  minPrice: string;
+  maxPrice: string;
+}
+
 export interface ComponentsApiResponse<T> {
   items: T[];
   count: number;
