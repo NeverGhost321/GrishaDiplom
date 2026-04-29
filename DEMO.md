@@ -10,7 +10,7 @@
 npm install
 npx prisma generate
 npx prisma migrate dev
-npm run seed
+npm run prisma:seed
 npm run dev
 ```
 
