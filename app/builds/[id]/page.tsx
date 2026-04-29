@@ -22,6 +22,7 @@ export default function BuildDetailsPage({ params }: { params: { id: string } })
   const [error, setError] = useState<string | null>(null);
   const [notFound, setNotFound] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [pdfExporting, setPdfExporting] = useState(false);
 
   useEffect(() => {
     async function loadBuild() {
@@ -61,6 +62,32 @@ export default function BuildDetailsPage({ params }: { params: { id: string } })
     }
   }
 
+  async function onExportPdf() {
+    if (!build) return;
+
+    setPdfExporting(true);
+    setError(null);
+
+    try {
+      const response = await fetch(`/api/builds/${build.id}/export/pdf`);
+      if (!response.ok) throw new Error();
+
+      const blob = await response.blob();
+      const downloadUrl = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = `pc-build-${build.id}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(downloadUrl);
+    } catch {
+      setError('Не удалось скачать PDF-файл сборки.');
+    } finally {
+      setPdfExporting(false);
+    }
+  }
+
   if (loading) return <div className="rounded-xl border border-slate-800 bg-slate-900 p-6 text-slate-300">Загружаем детали сборки...</div>;
   if (notFound) return <Alert variant="warning" title="Сборка не найдена">Сборка с ID {params.id} отсутствует.</Alert>;
   if (error || !build) return <Alert variant="danger" title="Ошибка загрузки">{error || 'Пустые данные сборки.'}</Alert>;
@@ -86,6 +113,7 @@ export default function BuildDetailsPage({ params }: { params: { id: string } })
       <div className="flex flex-wrap gap-3">
         <Button variant="danger" onClick={onDeleteBuild} disabled={deleting}>{deleting ? 'Удаление...' : 'Удалить сборку'}</Button>
         <Link href={`/api/builds/${build.id}/export`} prefetch={false} className="inline-flex items-center justify-center rounded-lg bg-transparent px-4 py-2 text-sm font-medium text-slate-200 transition-colors hover:bg-slate-800">Экспорт JSON</Link>
+        <Button variant="secondary" onClick={onExportPdf} disabled={pdfExporting}>{pdfExporting ? 'Экспорт PDF...' : 'Экспорт PDF'}</Button>
         <Link href="/saved-builds" className="inline-flex items-center justify-center rounded-lg bg-transparent px-4 py-2 text-sm font-medium text-slate-200 transition-colors hover:bg-slate-800">Назад к списку сборок</Link>
         <Link href="/manual-build" className="inline-flex items-center justify-center rounded-lg bg-transparent px-4 py-2 text-sm font-medium text-slate-200 transition-colors hover:bg-slate-800">Редактировать (TODO)</Link>
       </div>
