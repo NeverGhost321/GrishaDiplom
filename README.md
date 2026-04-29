@@ -216,3 +216,39 @@ Content-Type: application/json
   ]
 }
 ```
+
+## Автоматический подбор сборки
+
+Добавлен `BuildGeneratorService` (`src/services/build-generator.service.ts`) с функцией `generateBuild(params, componentsPool)` для автоматического подбора игровой конфигурации.
+
+### Входные параметры
+
+- `budget: number` — максимальный бюджет сборки;
+- `targetResolution: "fullhd" | "qhd" | "uhd"` — целевое разрешение;
+- `priority: "performance" | "balanced" | "budget" | "reliability" | "upgrade"` — приоритет пользователя;
+- `preferredBrands?: string[]` — бренды с мягким бонусом при scoring;
+- `excludedBrands?: string[]` — бренды, которые исключаются из пула кандидатов.
+
+### Общий алгоритм
+
+1. Фильтрация пула по `excludedBrands` (с учётом `brand`, `manufacturer`, `gpuManufacturer`, `boardManufacturer`).
+2. Эвристическое распределение бюджета по категориям (GPU/CPU/MB/RAM/PSU/Storage/Case/Cooler).
+3. Выбор топ-кандидатов GPU под целевое разрешение.
+4. Подбор CPU соответствующего уровня, затем материнской платы, RAM, SSD, PSU, корпуса и кулера.
+5. Проверка каждой комбинации через `CompatibilityService` (`checkCompatibility`).
+6. Расчёт `buildScore` с учётом совместимости, производительности, цены, надёжности, приоритета, preferred-брендов и warning-штрафов.
+7. Возврат лучшей совместимой сборки или `null`, если подходящий вариант не найден.
+
+### Критерии scoring
+
+- `compatibilityScore` из результата совместимости;
+- производительность пары CPU/GPU;
+- соответствие бюджету (разные акценты для `performance` и `budget`);
+- показатели надёжности (в т.ч. `psu.reliabilityScore`, `motherboard.vrmQualityScore`);
+- бонусы для `upgrade`-ориентированных платформ (DDR5, AM5/LGA1700, PCIe 4.0+);
+- бонусы preferred-брендов;
+- штраф за warnings.
+
+Сервис также формирует:
+- `explanation` на русском языке;
+- `alternatives` с альтернативными GPU/CPU/RAM/PSU.
