@@ -8,11 +8,13 @@ import {
 import type { SelectedBuildComponents } from '../types/build';
 import type { CompatibilityResult } from '../types/compatibility';
 
-export function splitCsv(value: string): string[] {
+export function splitCsv(value: string | null | undefined): string[] {
+  if (!value) return [];
   return value.split(',').map((part) => part.trim()).filter(Boolean);
 }
 
-export function includesNormalized(list: string, item: string): boolean {
+export function includesNormalized(list: string | null | undefined, item: string | null | undefined): boolean {
+  if (!item) return false;
   const normalizedItem = item.trim().toLowerCase();
   return splitCsv(list).some((entry) => entry.toLowerCase() === normalizedItem);
 }
@@ -30,7 +32,8 @@ export function isPcieNewer(
   return parsePcieVersion(first) > parsePcieVersion(second);
 }
 
-export function containsIgnoreCase(value: string, keywords: string[]): boolean {
+export function containsIgnoreCase(value: string | null | undefined, keywords: string[]): boolean {
+  if (!value) return false;
   const normalized = value.toLowerCase();
   return keywords.some((keyword) => normalized.includes(keyword.toLowerCase()));
 }
