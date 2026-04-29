@@ -1,29 +1,5 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
-
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  children: ReactNode;
-  variant?: 'primary' | 'secondary' | 'danger';
-  size?: 'sm' | 'md' | 'lg';
-  loading?: boolean;
-}
-
-const variantClasses = {
-  primary: 'bg-blue-600 text-white border border-blue-600 hover:bg-blue-700',
-  secondary: 'bg-white text-slate-800 border border-slate-300 hover:bg-slate-50',
-  danger: 'bg-red-600 text-white border border-red-600 hover:bg-red-700'
-};
-
-const sizeClasses = { sm: 'h-9 px-3 text-sm', md: 'h-10 px-4 text-sm', lg: 'h-11 px-5 text-base' };
-
-export function Button({ children, variant = 'primary', size = 'md', className = '', disabled, loading, ...props }: ButtonProps) {
-  const isDisabled = disabled || loading;
-  return (
-    <button
-      className={`inline-flex items-center justify-center gap-2 rounded-xl font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 disabled:cursor-not-allowed disabled:opacity-60 ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
-      disabled={isDisabled}
-      {...props}
-    >
-      {loading ? 'Загрузка...' : children}
-    </button>
-  );
-}
+interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> { children: ReactNode; variant?: 'primary'|'secondary'|'ghost'|'danger'; size?: 'sm'|'md'|'lg'; loading?: boolean; }
+const variantClasses={primary:'border border-blue-400/30 bg-blue-500 text-white hover:bg-blue-400 shadow-[0_0_30px_rgba(59,130,246,0.25)]',secondary:'border border-white/10 bg-[#151D2A] text-slate-100 hover:bg-[#1B2433]',ghost:'border border-transparent bg-transparent text-slate-300 hover:bg-white/5',danger:'border border-red-400/30 bg-red-500/80 text-white hover:bg-red-500'};
+const sizeClasses={sm:'h-9 px-3 text-sm',md:'h-10 px-4 text-sm',lg:'h-11 px-5 text-base'};
+export function Button({children,variant='primary',size='md',className='',disabled,loading,...props}:ButtonProps){const isDisabled=disabled||loading;return <button className={`inline-flex items-center justify-center gap-2 rounded-xl font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 disabled:cursor-not-allowed disabled:opacity-60 ${variantClasses[variant]} ${sizeClasses[size]} ${className}`} disabled={isDisabled} {...props}>{loading?'Подождите…':children}</button>;}
