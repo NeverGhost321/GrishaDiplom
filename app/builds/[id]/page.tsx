@@ -119,7 +119,7 @@ export default function BuildDetailsPage({ params }: { params: { id: string } })
       </Card>
       <Card title="Комплектующие">
         <ul className="grid gap-2 text-sm text-slate-300 md:grid-cols-2">
-          <li>CPU: {build.cpu.brand} {build.cpu.name} — {formatPrice(build.cpu.price)}</li><li>Motherboard: {build.motherboard.name} — {formatPrice(build.motherboard.price)}</li><li>RAM: {build.ram.name} — {formatPrice(build.ram.price)}</li><li>GPU: {build.gpu.brand} {build.gpu.name} — {formatPrice(build.gpu.price)}</li><li>Storage: {build.storage.name} — {formatPrice(build.storage.price)}</li><li>PSU: {build.psu.name} — {formatPrice(build.psu.price)}</li><li>Case: {build.pcCase.name} — {formatPrice(build.pcCase.price)}</li>{build.cooler ? <li>Cooler: {build.cooler.name} — {formatPrice(build.cooler.price)}</li> : <li>Cooler: отсутствует</li>}
+          <li>Процессор: {build.cpu.brand} {build.cpu.name} — {formatPrice(build.cpu.price)}</li><li>Материнская плата: {build.motherboard.name} — {formatPrice(build.motherboard.price)}</li><li>ОЗУ: {build.ram.name} — {formatPrice(build.ram.price)}</li><li>Видеокарта: {build.gpu.brand} {build.gpu.name} — {formatPrice(build.gpu.price)}</li><li>Накопитель: {build.storage.name} — {formatPrice(build.storage.price)}</li><li>Блок питания: {build.psu.name} — {formatPrice(build.psu.price)}</li><li>Корпус: {build.pcCase.name} — {formatPrice(build.pcCase.price)}</li>{build.cooler ? <li>Кулер: {build.cooler.name} — {formatPrice(build.cooler.price)}</li> : <li>Кулер: отсутствует</li>}
         </ul>
       </Card>
       <div className="flex flex-wrap gap-3">
@@ -127,7 +127,7 @@ export default function BuildDetailsPage({ params }: { params: { id: string } })
         <Button variant="ghost" onClick={async () => { if (!build || jsonExporting) return; setJsonExporting(true); try { const response = await fetch(`/api/builds/${build.id}/export`); if (!response.ok) throw new Error(); const blob = await response.blob(); const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href = url; link.download = `pc-build-${build.id}.json`; document.body.appendChild(link); link.click(); link.remove(); URL.revokeObjectURL(url); showToast('JSON успешно экспортирован.', 'success'); } catch (error) { console.error(error); setError('Не удалось скачать JSON-файл сборки.'); showToast('Ошибка экспорта JSON.', 'error'); } finally { setJsonExporting(false); } }} disabled={jsonExporting}>{jsonExporting ? 'Экспорт JSON...' : 'Экспорт JSON'}</Button>
         <Button variant="secondary" onClick={onExportPdf} disabled={pdfExporting}>{pdfExporting ? 'Экспорт PDF...' : 'Экспорт PDF'}</Button>
         <Link href="/saved-builds" className="inline-flex items-center justify-center rounded-lg bg-transparent px-4 py-2 text-sm font-medium text-slate-200 transition-colors hover:bg-slate-800">Назад к списку сборок</Link>
-        <Link href="/manual-build" className="inline-flex items-center justify-center rounded-lg bg-transparent px-4 py-2 text-sm font-medium text-slate-200 transition-colors hover:bg-slate-800">Редактировать (TODO)</Link>
+        <Link href="/manual-build" className="inline-flex items-center justify-center rounded-lg bg-transparent px-4 py-2 text-sm font-medium text-slate-200 transition-colors hover:bg-slate-800">Редактирование будет расширено в следующих версиях</Link>
       </div>
     </section>
   );
