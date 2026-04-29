@@ -75,3 +75,18 @@ npm run prisma:seed
 - `src/lib/scoring.ts` — расчёт цены, энергопотребления, требуемой мощности БП, итогового score и CPU/GPU-баланса.
 
 На следующем шаге эти типы и утилиты будут использоваться в сервисах подбора и валидации совместимости компонентов.
+
+## Проверка совместимости
+
+В проект добавлен сервис `CompatibilityService` (`src/services/compatibility.service.ts`) с функцией `checkCompatibility(components)`, которая возвращает стандартизированный `CompatibilityResult`.
+
+Сервис выполняет проверку:
+- CPU ↔ Motherboard (сокет, поколение, VRM, возможное обновление BIOS);
+- Motherboard ↔ RAM и CPU ↔ RAM (тип памяти, частоты, объём, количество модулей);
+- GPU ↔ Motherboard (сравнение версий PCIe);
+- GPU ↔ PSU (рекомендованная и расчётная мощность, 12VHPWR, надёжность БП);
+- GPU/Cooler/Motherboard/PSU ↔ Case (габариты и поддержка форм-факторов);
+- Storage ↔ Motherboard (SATA/M.2/NVMe и PCIe-ограничения);
+- Cooler ↔ CPU/Case (TDP и высота);
+- CPU/GPU bottleneck с рекомендациями по балансу;
+- расчёт итоговых метрик: `totalPowerConsumption`, `requiredPsuWattage`, `totalPrice`, `compatibilityScore`.
