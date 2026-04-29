@@ -62,6 +62,30 @@ function getGpuPower(gpu: (Gpu & { powerDrawWatts?: number }) | undefined): numb
   return (gpu as unknown as { powerConsumption?: number; powerDrawWatts?: number }).powerConsumption ?? (gpu as unknown as { powerDrawWatts?: number }).powerDrawWatts ?? null;
 }
 
+function normalizeWithName<T extends { name?: string; model?: string }>(item: T): T & { name: string } {
+  return {
+    ...item,
+    name: getName(item),
+  };
+}
+
+function normalizeCpu(item: Cpu & { model?: string; tdpWatts?: number }): Cpu {
+  const normalized = normalizeWithName(item);
+  return {
+    ...normalized,
+    tdp: normalized.tdp ?? item.tdpWatts ?? 0,
+  };
+}
+
+function normalizeGpu(item: Gpu & { model?: string; powerDrawWatts?: number; recommendedPsuWatts?: number }): Gpu {
+  const normalized = normalizeWithName(item);
+  return {
+    ...normalized,
+    powerConsumption: normalized.powerConsumption ?? item.powerDrawWatts ?? 0,
+    recommendedPsuWattage: normalized.recommendedPsuWattage ?? item.recommendedPsuWatts ?? 0,
+  };
+}
+
 
 export default function ManualBuildPage() {
   const [components, setComponents] = useState<ManualBuildState>({
