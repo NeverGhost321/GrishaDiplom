@@ -38,7 +38,7 @@
 npm install
 npx prisma generate
 npx prisma migrate dev
-npm run seed
+
 npm run dev
 ```
 После запуска приложение доступно по адресу: `http://localhost:3000`.
@@ -52,8 +52,6 @@ npx prisma migrate dev
 npx prisma generate
 
 # заполнить БД демо-данными
-npm run seed
-```
 
 ## Команды тестирования
 ```bash

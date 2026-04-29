@@ -62,6 +62,7 @@ function getGpuPower(gpu: (Gpu & { powerDrawWatts?: number }) | undefined): numb
   return (gpu as unknown as { powerConsumption?: number; powerDrawWatts?: number }).powerConsumption ?? (gpu as unknown as { powerDrawWatts?: number }).powerDrawWatts ?? null;
 }
 
+
 export default function ManualBuildPage() {
   const [components, setComponents] = useState<ManualBuildState>({
     cpus: [], motherboards: [], rams: [], gpus: [], psus: [], storages: [], cases: [], coolers: [],
@@ -91,7 +92,16 @@ export default function ManualBuildPage() {
           fetchCollection<PcCase>('/api/components/cases'),
           fetchCollection<Cooler>('/api/components/coolers'),
         ]);
-        setComponents({ cpus, motherboards, rams, gpus, psus, storages, cases, coolers });
+        setComponents({
+          cpus: cpus.map((item) => normalizeCpu(item as Cpu & { model?: string; tdpWatts?: number })),
+          motherboards: motherboards.map((item) => normalizeWithName(item as Motherboard & { model?: string })),
+          rams: rams.map((item) => normalizeWithName(item as Ram & { model?: string })),
+          gpus: gpus.map((item) => normalizeGpu(item as Gpu & { model?: string; powerDrawWatts?: number; recommendedPsuWatts?: number })),
+          psus: psus.map((item) => normalizeWithName(item as Psu & { model?: string })),
+          storages: storages.map((item) => normalizeWithName(item as Storage & { model?: string })),
+          cases: cases.map((item) => normalizeWithName(item as PcCase & { model?: string })),
+          coolers: coolers.map((item) => normalizeWithName(item as Cooler & { model?: string })),
+        });
       } catch (error) {
         console.error(error);
         const message = error instanceof Error ? error.message : 'Не удалось загрузить комплектующие.';
