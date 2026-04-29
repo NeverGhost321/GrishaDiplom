@@ -90,3 +90,27 @@ npm run prisma:seed
 - Cooler ↔ CPU/Case (TDP и высота);
 - CPU/GPU bottleneck с рекомендациями по балансу;
 - расчёт итоговых метрик: `totalPowerConsumption`, `requiredPsuWattage`, `totalPrice`, `compatibilityScore`.
+
+## Тестирование
+
+Для автоматической проверки `CompatibilityService` используется **Vitest**.
+
+Запуск тестов:
+
+```bash
+npm test
+```
+
+Также доступен watch-режим:
+
+```bash
+npm run test:watch
+```
+
+Основные покрытые сценарии:
+- полностью совместимая сборка без ошибок и предупреждений;
+- несовместимости CPU/Motherboard (сокет, поколение), RAM и кулера;
+- недостаточная мощность БП и габаритные ограничения корпуса;
+- ограничения по PCIe, предупреждения по BIOS и по частоте RAM;
+- отсутствие M.2 слотов для NVMe;
+- предупреждения по bottleneck CPU/GPU и отсутствию 12VHPWR для мощных видеокарт.
