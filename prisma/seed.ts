@@ -3,13 +3,15 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
-  await prisma.component.createMany({
-    data: [
-      { type: 'CPU', brand: 'AMD', model: 'Ryzen 5 7600', price: 22000 },
-      { type: 'GPU', brand: 'NVIDIA', model: 'GeForce RTX 4060', price: 38000 },
-      { type: 'RAM', brand: 'Kingston', model: '32GB DDR5', price: 11000 }
-    ]
-  });
+  await prisma.build.deleteMany();
+  await prisma.cpu.deleteMany();
+  await prisma.motherboard.deleteMany();
+  await prisma.ram.deleteMany();
+  await prisma.gpu.deleteMany();
+  await prisma.psu.deleteMany();
+  await prisma.storage.deleteMany();
+  await prisma.pcCase.deleteMany();
+  await prisma.cooler.deleteMany();
 }
 
 main()
