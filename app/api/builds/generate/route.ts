@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { generateBuild } from '@/src/services/build-generator.service';
 import type { BuildGenerationParams } from '@/src/types/build';
+import type { Cooler, Cpu, Gpu, Motherboard, PcCase, Psu, Ram, Storage } from '@/src/types/components';
 
 type BuildGenerationRequestBody = BuildGenerationParams;
 
@@ -81,7 +82,7 @@ export async function POST(request: Request) {
 
     const params = body as BuildGenerationRequestBody;
 
-    const [cpus, motherboards, rams, gpus, psus, storages, cases, coolers] = await Promise.all([
+    const [cpusRaw, motherboardsRaw, ramsRaw, gpusRaw, psusRaw, storagesRaw, casesRaw, coolersRaw] = await Promise.all([
       prisma.cpu.findMany(),
       prisma.motherboard.findMany(),
       prisma.ram.findMany(),
@@ -91,6 +92,39 @@ export async function POST(request: Request) {
       prisma.pcCase.findMany(),
       prisma.cooler.findMany(),
     ]);
+
+    const cpus: Cpu[] = cpusRaw.map((cpu) => ({
+      id: cpu.id,
+      name: cpu.model,
+      brand: cpu.brand,
+      socket: cpu.socket,
+      cores: cpu.cores,
+      threads: cpu.threads,
+      baseClockGhz: cpu.baseClockGhz,
+      boostClockGhz: cpu.boostClockGhz,
+      tdp: cpu.tdpWatts,
+      integratedGraphics: cpu.integratedGraphics,
+      generation: cpu.generation,
+      price: cpu.price,
+    }));
+    const motherboards: Motherboard[] = motherboardsRaw.map((mb) => ({ ...mb, name: mb.model }));
+    const rams: Ram[] = ramsRaw.map((ram) => ({ ...ram, name: ram.model }));
+    const gpus: Gpu[] = gpusRaw.map((gpu) => ({
+      id: gpu.id,
+      name: gpu.model,
+      brand: gpu.brand,
+      chipset: gpu.chipset,
+      vramGb: gpu.vramGb,
+      lengthMm: gpu.lengthMm,
+      powerConsumption: gpu.powerDrawWatts,
+      recommendedPsuWattage: gpu.recommendedPsuWatts,
+      pcieInterface: gpu.pcieInterface,
+      price: gpu.price,
+    }));
+    const psus: Psu[] = psusRaw.map((psu) => ({ ...psu, name: psu.model }));
+    const storages: Storage[] = storagesRaw.map((storage) => ({ ...storage, name: storage.model }));
+    const cases: PcCase[] = casesRaw.map((pcCase) => ({ ...pcCase, name: pcCase.model }));
+    const coolers: Cooler[] = coolersRaw.map((cooler) => ({ ...cooler, name: cooler.model }));
 
     const result = generateBuild(params, {
       cpus,
