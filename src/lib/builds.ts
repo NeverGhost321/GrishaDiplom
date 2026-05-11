@@ -1,3 +1,13 @@
+import type {
+  Cooler as PrismaCooler,
+  Cpu as PrismaCpu,
+  Gpu as PrismaGpu,
+  Motherboard as PrismaMotherboard,
+  PcCase as PrismaPcCase,
+  Psu as PrismaPsu,
+  Ram as PrismaRam,
+  Storage as PrismaStorage,
+} from '@prisma/client';
 import type { Cooler, Cpu, Gpu, Motherboard, PcCase, Psu, Ram, Storage } from '@/src/types/components';
 import type { SelectedBuildComponents } from '@/src/types/build';
 import { prisma } from '@/lib/prisma';
@@ -23,6 +33,86 @@ export function parsePositiveId(value: string): number | null {
   return parsed;
 }
 
+export function mapCpu(cpu: PrismaCpu): Cpu {
+  return {
+    id: cpu.id,
+    name: cpu.model,
+    brand: cpu.brand,
+    socket: cpu.socket,
+    cores: cpu.cores,
+    threads: cpu.threads,
+    baseClockGhz: cpu.baseClockGhz,
+    boostClockGhz: cpu.boostClockGhz,
+    tdp: cpu.tdpWatts,
+    integratedGraphics: cpu.integratedGraphics,
+    generation: cpu.generation,
+    price: cpu.price,
+  };
+}
+
+export function mapMotherboard(motherboard: PrismaMotherboard): Motherboard {
+  return { ...motherboard, name: motherboard.model };
+}
+
+export function mapRam(ram: PrismaRam): Ram {
+  return { ...ram, name: ram.model };
+}
+
+export function mapGpu(gpu: PrismaGpu): Gpu {
+  return {
+    id: gpu.id,
+    name: gpu.model,
+    brand: gpu.brand,
+    chipset: gpu.chipset,
+    vramGb: gpu.vramGb,
+    lengthMm: gpu.lengthMm,
+    powerConsumption: gpu.powerDrawWatts,
+    recommendedPsuWattage: gpu.recommendedPsuWatts,
+    pcieInterface: gpu.pcieInterface,
+    price: gpu.price,
+  };
+}
+
+export function mapPsu(psu: PrismaPsu): Psu {
+  return { ...psu, name: psu.model };
+}
+
+export function mapStorage(storage: PrismaStorage): Storage {
+  return { ...storage, name: storage.model };
+}
+
+export function mapPcCase(pcCase: PrismaPcCase): PcCase {
+  return { ...pcCase, name: pcCase.model };
+}
+
+export function mapCooler(cooler: PrismaCooler): Cooler {
+  return { ...cooler, name: cooler.model };
+}
+
+export type PrismaComponentRecords = {
+  cpu: PrismaCpu;
+  motherboard: PrismaMotherboard;
+  ram: PrismaRam;
+  gpu: PrismaGpu;
+  psu: PrismaPsu;
+  storage: PrismaStorage;
+  pcCase: PrismaPcCase;
+  cooler: PrismaCooler;
+};
+
+export function mapComponentsByRecords(records: PrismaComponentRecords): SelectedBuildComponents {
+  return {
+    cpu: mapCpu(records.cpu),
+    motherboard: mapMotherboard(records.motherboard),
+    ram: mapRam(records.ram),
+    gpu: mapGpu(records.gpu),
+    psu: mapPsu(records.psu),
+    storage: mapStorage(records.storage),
+    pcCase: mapPcCase(records.pcCase),
+    cooler: mapCooler(records.cooler),
+  };
+}
+
 export async function loadComponentsByIds(ids: BuildComponentIds) {
   const [cpu, motherboard, ram, gpu, psu, storage, pcCase, cooler] = await Promise.all([
     prisma.cpu.findUnique({ where: { id: ids.cpuId } }),
@@ -45,20 +135,20 @@ export async function loadComponentsByIds(ids: BuildComponentIds) {
   if (!pcCase) details.push('Корпус с указанным id не найден.');
   if (!cooler) details.push('Кулер с указанным id не найден.');
 
-  if (details.length > 0) {
+  if (details.length > 0 || !cpu || !motherboard || !ram || !gpu || !psu || !storage || !pcCase || !cooler) {
     return { details };
   }
 
-  const components: SelectedBuildComponents = {
-    cpu: cpu as unknown as Cpu,
-    motherboard: motherboard as unknown as Motherboard,
-    ram: ram as unknown as Ram,
-    gpu: gpu as unknown as Gpu,
-    psu: psu as unknown as Psu,
-    storage: storage as unknown as Storage,
-    pcCase: pcCase as unknown as PcCase,
-    cooler: cooler as unknown as Cooler,
+  return {
+    components: mapComponentsByRecords({
+      cpu,
+      motherboard,
+      ram,
+      gpu,
+      psu,
+      storage,
+      pcCase,
+      cooler,
+    }),
   };
-
-  return { components };
 }
