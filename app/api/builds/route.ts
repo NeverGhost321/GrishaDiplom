@@ -1,13 +1,27 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { checkCompatibility } from '@/src/services/compatibility.service';
-import { loadComponentsByIds, type BuildComponentIds } from '@/src/lib/builds';
+import {
+  loadComponentsByIds,
+  mapComponentsByRecords,
+  type BuildComponentIds,
+  type PrismaComponentRecords,
+} from '@/src/lib/builds';
 import { getCurrentUser } from '@/lib/auth';
 
 type CreateBuildRequestBody = BuildComponentIds & {
   name: string;
   budget: number;
 };
+
+function mapBuildItemForResponse<T extends PrismaComponentRecords>(item: T) {
+  const components = mapComponentsByRecords(item);
+
+  return {
+    ...item,
+    ...components,
+  };
+}
 
 const REQUIRED_FIELDS: Array<keyof BuildComponentIds> = [
   'cpuId',
@@ -59,7 +73,7 @@ export async function GET() {
       orderBy: { createdAt: 'desc' },
     });
 
-    return NextResponse.json({ items, count: items.length });
+    return NextResponse.json({ items: items.map(mapBuildItemForResponse), count: items.length });
   } catch {
     return NextResponse.json({ error: 'Не удалось получить список сохранённых сборок.' }, { status: 500 });
   }
@@ -110,7 +124,7 @@ export async function POST(request: Request) {
       include: { cpu: true, motherboard: true, ram: true, gpu: true, psu: true, storage: true, pcCase: true, cooler: true },
     });
 
-    return NextResponse.json({ item, compatibilityResult }, { status: 201 });
+    return NextResponse.json({ item: mapBuildItemForResponse(item), compatibilityResult }, { status: 201 });
   } catch {
     return NextResponse.json({ error: 'Не удалось сохранить сборку.' }, { status: 500 });
   }
